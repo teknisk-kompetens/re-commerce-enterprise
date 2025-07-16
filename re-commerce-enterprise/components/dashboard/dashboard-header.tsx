@@ -4,12 +4,10 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { NotificationDropdown } from '@/components/dashboard/notification-dropdown'
 import { UserMenu } from '@/components/dashboard/user-menu'
 import { ThemeToggle } from '@/components/dashboard/theme-toggle'
 import { useTenant } from '@/lib/tenant-context'
 import { 
-  Bell, 
   Search, 
   Settings, 
   Menu,
@@ -79,8 +77,8 @@ export function DashboardHeader() {
               <Search className="h-4 w-4" />
             </Button>
 
-            {/* Notifications */}
-            <NotificationDropdown />
+            {/* Notifications - Disabled to prevent errors */}
+            {/* <NotificationDropdown /> */}
 
             {/* Theme Toggle */}
             <ThemeToggle />

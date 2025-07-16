@@ -1,461 +1,523 @@
 
 'use client';
 
-/**
- * WIDGET FACTORY WORKSPACE
- * Main workspace component that orchestrates all widget factory functionality
- */
-
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Layers, 
-  Settings, 
-  Users, 
-  Palette, 
-  Grid,
-  ZoomIn,
-  ZoomOut,
-  Undo,
-  Redo,
-  Play,
-  Save,
-  Share
-} from 'lucide-react';
-
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { WidgetCanvas } from './widget-canvas';
-import { WidgetRegistry } from './widget-registry';
-import { BlueprintDesigner } from './blueprint-designer';
-import { PropertiesPanel } from './properties-panel';
-import { CollaborationBar } from './collaboration-bar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { 
+  Palette,
+  Plus,
+  Save,
+  Download,
+  Upload,
+  Share2,
+  Settings,
+  Users,
+  Layers,
+  Grid,
+  MousePointer,
+  Type,
+  Image as ImageIcon,
+  BarChart3,
+  Play,
+  Pause,
+  RefreshCw,
+  Eye,
+  Code,
+  Smartphone,
+  Monitor,
+  Tablet,
+  Home,
+  ArrowLeft
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ErrorBoundary, ComponentErrorFallback } from '@/components/error-boundary';
+import { LoadingStates } from '@/components/loading-states';
+import Link from 'next/link';
 
-
-// Import our systems
-import { canvasSystem } from '@/lib/canvas-system';
-import { widgetRegistry } from '@/lib/widget-registry';
-import { blueprintSystem } from '@/lib/blueprint-system';
-import { collaborationEngine } from '@/lib/collaboration-engine';
-import { dragDropSystem } from '@/lib/drag-drop-system';
-import { widgetCommunication } from '@/lib/widget-communication-enhanced';
-
-interface WorkspaceState {
-  activePanel: 'registry' | 'blueprint' | 'properties' | null;
-  selectedWidgets: string[];
-  canvasId: string;
-  collaborationSession: string | null;
-  isCollaborating: boolean;
-  showGrid: boolean;
-  snapToGrid: boolean;
-  zoom: number;
+interface Widget {
+  id: string;
+  name: string;
+  type: string;
+  category: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  properties: Record<string, any>;
 }
 
+interface WidgetTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  icon: React.ComponentType<any>;
+  preview: string;
+}
+
+const widgetTemplates: WidgetTemplate[] = [
+  {
+    id: 'chart-bar',
+    name: 'Bar Chart',
+    description: 'Interactive bar chart for data visualization',
+    category: 'Charts',
+    icon: BarChart3,
+    preview: 'chart-preview.png'
+  },
+  {
+    id: 'text-block',
+    name: 'Text Block',
+    description: 'Rich text content with formatting options',
+    category: 'Content',
+    icon: Type,
+    preview: 'text-preview.png'
+  },
+  {
+    id: 'image-gallery',
+    name: 'Image Gallery',
+    description: 'Responsive image gallery with lightbox',
+    category: 'Media',
+    icon: ImageIcon,
+    preview: 'gallery-preview.png'
+  },
+  {
+    id: 'button-group',
+    name: 'Button Group',
+    description: 'Customizable button components',
+    category: 'Interactive',
+    icon: MousePointer,
+    preview: 'button-preview.png'
+  }
+];
+
 export function WidgetFactoryWorkspace() {
-  const canvasRef = useRef<HTMLDivElement>(null);
-  const [workspace, setWorkspace] = useState<WorkspaceState>({
-    activePanel: 'registry',
-    selectedWidgets: [],
-    canvasId: '',
-    collaborationSession: null,
-    isCollaborating: false,
-    showGrid: true,
-    snapToGrid: true,
-    zoom: 1,
-  });
+  const [widgets, setWidgets] = useState<Widget[]>([]);
+  const [selectedWidget, setSelectedWidget] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('canvas');
+  const [canvasMode, setCanvasMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+  const [isLoading, setIsLoading] = useState(true);
+  const [collaborators, setCollaborators] = useState([
+    { id: '1', name: 'John Doe', avatar: 'JD', status: 'active' },
+    { id: '2', name: 'Jane Smith', avatar: 'JS', status: 'active' },
+    { id: '3', name: 'Mike Johnson', avatar: 'MJ', status: 'idle' }
+  ]);
 
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [widgets, setWidgets] = useState<any[]>([]);
-  const [collaborators, setCollaborators] = useState<any[]>([]);
-
-  // Initialize systems
   useEffect(() => {
-    const initializeSystems = async () => {
-      try {
-        // Create new canvas
-        const canvas = await canvasSystem.createCanvas({
-          name: 'Widget Factory Canvas',
-          tenantId: 'default',
-          createdBy: 'current-user',
-        });
+    // Simulate loading
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
 
-        // Initialize collaboration
-        await collaborationEngine.initialize('current-user');
-        
-        // Initialize widget communication
-        await widgetCommunication.initialize();
-        
-        // Initialize drag & drop
-        if (canvasRef.current) {
-          dragDropSystem.initialize(canvasRef.current, {
-            snapToGrid: workspace.snapToGrid,
-            showGuidelines: true,
-            magneticSnap: true,
-            realTimeSync: true,
-          });
-        }
+    return () => clearTimeout(timer);
+  }, []);
 
-        setWorkspace(prev => ({
-          ...prev,
-          canvasId: canvas.id,
-        }));
-
-        setIsInitialized(true);
-        console.log('Widget Factory systems initialized');
-      } catch (error) {
-        console.error('Error initializing Widget Factory:', error);
+  const addWidget = (template: WidgetTemplate) => {
+    const newWidget: Widget = {
+      id: `widget-${Date.now()}`,
+      name: template.name,
+      type: template.id,
+      category: template.category,
+      x: Math.random() * 400,
+      y: Math.random() * 300,
+      width: 200,
+      height: 150,
+      properties: {
+        title: template.name,
+        description: template.description
       }
     };
 
-    initializeSystems();
-  }, []);
+    setWidgets(prev => [...prev, newWidget]);
+    setSelectedWidget(newWidget.id);
+  };
 
-  // Handle panel toggle
-  const togglePanel = useCallback((panel: WorkspaceState['activePanel']) => {
-    setWorkspace(prev => ({
-      ...prev,
-      activePanel: prev.activePanel === panel ? null : panel,
-    }));
-  }, []);
-
-  // Handle widget selection
-  const handleWidgetSelection = useCallback((widgetIds: string[]) => {
-    setWorkspace(prev => ({
-      ...prev,
-      selectedWidgets: widgetIds,
-    }));
-
-    // Update canvas selection
-    if (workspace.canvasId) {
-      canvasSystem.updateSelection(workspace.canvasId, {
-        widgetIds,
-        mode: 'set',
-      });
+  const getCanvasSize = () => {
+    switch (canvasMode) {
+      case 'mobile': return { width: 375, height: 667 };
+      case 'tablet': return { width: 768, height: 1024 };
+      default: return { width: 1200, height: 800 };
     }
-  }, [workspace.canvasId]);
+  };
 
-  // Handle canvas zoom
-  const handleZoom = useCallback((zoomLevel: number) => {
-    setWorkspace(prev => ({
-      ...prev,
-      zoom: zoomLevel,
-    }));
-
-    if (workspace.canvasId) {
-      canvasSystem.updateViewport(workspace.canvasId, {
-        zoom: zoomLevel,
-      });
-    }
-  }, [workspace.canvasId]);
-
-  // Handle grid toggle
-  const toggleGrid = useCallback(() => {
-    setWorkspace(prev => ({
-      ...prev,
-      showGrid: !prev.showGrid,
-    }));
-  }, []);
-
-  // Handle snap to grid toggle
-  const toggleSnapToGrid = useCallback(() => {
-    setWorkspace(prev => ({
-      ...prev,
-      snapToGrid: !prev.snapToGrid,
-    }));
-  }, []);
-
-  // Handle collaboration start
-  const startCollaboration = useCallback(async () => {
-    try {
-      const session = await collaborationEngine.startSession(workspace.canvasId);
-      setWorkspace(prev => ({
-        ...prev,
-        collaborationSession: session.id,
-        isCollaborating: true,
-      }));
-    } catch (error) {
-      console.error('Error starting collaboration:', error);
-    }
-  }, [workspace.canvasId]);
-
-  // Handle undo
-  const handleUndo = useCallback(() => {
-    if (workspace.canvasId) {
-      canvasSystem.undo(workspace.canvasId);
-    }
-  }, [workspace.canvasId]);
-
-  // Handle redo
-  const handleRedo = useCallback(() => {
-    if (workspace.canvasId) {
-      canvasSystem.redo(workspace.canvasId);
-    }
-  }, [workspace.canvasId]);
-
-  if (!isInitialized) {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-            Initializing Widget Factory
-          </h2>
-          <p className="text-gray-600 dark:text-gray-300">
-            Setting up canvas, collaboration, and systems...
-          </p>
-        </div>
-      </div>
-    );
+  if (isLoading) {
+    return <LoadingStates.PageLoading message="Initializing Widget Factory..." />;
   }
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-gray-900">
-      {/* Top Toolbar */}
-      <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="flex items-center justify-between px-4 py-2">
-          {/* Left section - Main actions */}
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleUndo}
-              className="p-2"
-            >
-              <Undo className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleRedo}
-              className="p-2"
-            >
-              <Redo className="h-4 w-4" />
-            </Button>
+    <ErrorBoundary fallback={ComponentErrorFallback}>
+      <div className="h-screen flex flex-col bg-white dark:bg-gray-900">
+        {/* Header */}
+        <header 
+          className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
+          role="banner"
+        >
+          <div className="flex items-center gap-4">
+            <Link href="/" aria-label="Return to home page">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                <Home className="h-4 w-4" />
+              </Button>
+            </Link>
             
-            <Separator orientation="vertical" className="h-6" />
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleZoom(workspace.zoom * 0.8)}
-              className="p-2"
-            >
-              <ZoomOut className="h-4 w-4" />
-            </Button>
-            <span className="text-sm text-gray-600 dark:text-gray-300 min-w-[60px] text-center">
-              {Math.round(workspace.zoom * 100)}%
-            </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleZoom(workspace.zoom * 1.25)}
-              className="p-2"
-            >
-              <ZoomIn className="h-4 w-4" />
-            </Button>
-            
-            <Separator orientation="vertical" className="h-6" />
-            
-            <Button
-              variant={workspace.showGrid ? "default" : "ghost"}
-              size="sm"
-              onClick={toggleGrid}
-              className="p-2"
-            >
-              <Grid className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <Palette className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold text-gray-900 dark:text-white">
+                  Widget Factory
+                </h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Advanced Widget Creation Workspace
+                </p>
+              </div>
+            </div>
+
+            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">
+              <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+              Live Collaboration
+            </Badge>
           </div>
 
-          {/* Center section - Title and status */}
-          <div className="flex items-center space-x-4">
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Widget Factory
-            </h1>
-            {workspace.isCollaborating && (
-              <Badge variant="secondary" className="bg-green-100 text-green-800">
-                <Users className="h-3 w-3 mr-1" />
-                Live
-              </Badge>
-            )}
-          </div>
+          <div className="flex items-center gap-2">
+            {/* Collaborators */}
+            <div className="flex items-center gap-2 mr-4">
+              <Users className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+              <div className="flex -space-x-1">
+                {collaborators.map((collaborator) => (
+                  <div
+                    key={collaborator.id}
+                    className={`w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-medium border-2 border-white dark:border-gray-900 ${
+                      collaborator.status === 'active' ? 'ring-2 ring-green-400' : ''
+                    }`}
+                    title={`${collaborator.name} (${collaborator.status})`}
+                  >
+                    {collaborator.avatar}
+                  </div>
+                ))}
+              </div>
+            </div>
 
-          {/* Right section - Actions */}
-          <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm">
-              <Play className="h-4 w-4 mr-2" />
-              Preview
-            </Button>
-            <Button variant="ghost" size="sm">
+            {/* Actions */}
+            <Button variant="outline" size="sm" aria-label="Save project">
               <Save className="h-4 w-4 mr-2" />
               Save
             </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={workspace.isCollaborating ? undefined : startCollaboration}
-            >
-              <Share className="h-4 w-4 mr-2" />
-              {workspace.isCollaborating ? 'Sharing' : 'Share'}
+            
+            <Button variant="outline" size="sm" aria-label="Share project">
+              <Share2 className="h-4 w-4 mr-2" />
+              Share
+            </Button>
+            
+            <Button size="sm" aria-label="Preview project">
+              <Eye className="h-4 w-4 mr-2" />
+              Preview
             </Button>
           </div>
-        </div>
+        </header>
 
-        {/* Collaboration Bar */}
-        {workspace.isCollaborating && (
-          <CollaborationBar 
-            sessionId={workspace.collaborationSession!}
-            participants={collaborators}
-          />
-        )}
-      </div>
+        {/* Main Workspace */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Sidebar - Widget Library */}
+          <div className="w-64 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 overflow-y-auto">
+            <div className="p-4">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
+                Widget Library
+              </h3>
+              
+              <div className="space-y-3">
+                {widgetTemplates.map((template) => (
+                  <motion.div
+                    key={template.id}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Card 
+                      className="cursor-pointer hover:shadow-md transition-all duration-200 group"
+                      onClick={() => addWidget(template)}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Add ${template.name} widget`}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          addWidget(template);
+                        }
+                      }}
+                    >
+                      <CardContent className="p-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-900/40 transition-colors">
+                            <template.icon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-sm text-gray-900 dark:text-white truncate">
+                              {template.name}
+                            </h4>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                              {template.description}
+                            </p>
+                            <Badge variant="outline" className="text-xs mt-1">
+                              {template.category}
+                            </Badge>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Sidebar */}
-        <div className="w-80 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex flex-col">
-          {/* Panel Tabs */}
-          <div className="border-b border-gray-200 dark:border-gray-700">
-            <div className="flex">
-              <Button
-                variant={workspace.activePanel === 'registry' ? "default" : "ghost"}
-                size="sm"
-                onClick={() => togglePanel('registry')}
-                className="flex-1 rounded-none"
-              >
-                <Palette className="h-4 w-4 mr-2" />
-                Widgets
-              </Button>
-              <Button
-                variant={workspace.activePanel === 'blueprint' ? "default" : "ghost"}
-                size="sm"
-                onClick={() => togglePanel('blueprint')}
-                className="flex-1 rounded-none"
-              >
-                <Layers className="h-4 w-4 mr-2" />
-                Blueprints
-              </Button>
-              <Button
-                variant={workspace.activePanel === 'properties' ? "default" : "ghost"}
-                size="sm"
-                onClick={() => togglePanel('properties')}
-                className="flex-1 rounded-none"
-              >
-                <Settings className="h-4 w-4 mr-2" />
-                Properties
-              </Button>
+              {/* Quick Actions */}
+              <div className="mt-6 space-y-2">
+                <h4 className="font-medium text-sm text-gray-700 dark:text-gray-300">
+                  Quick Actions
+                </h4>
+                <Button variant="outline" size="sm" className="w-full justify-start">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Import Widget
+                </Button>
+                <Button variant="outline" size="sm" className="w-full justify-start">
+                  <Code className="h-4 w-4 mr-2" />
+                  Custom Code
+                </Button>
+              </div>
             </div>
           </div>
 
-          {/* Panel Content */}
-          <div className="flex-1 overflow-hidden">
-            <AnimatePresence mode="wait">
-              {workspace.activePanel === 'registry' && (
+          {/* Main Canvas Area */}
+          <div className="flex-1 flex flex-col">
+            {/* Canvas Toolbar */}
+            <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+              <div className="flex items-center gap-4">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Canvas:
+                </span>
+                <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+                  <Button
+                    variant={canvasMode === 'desktop' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setCanvasMode('desktop')}
+                    aria-label="Desktop view"
+                  >
+                    <Monitor className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={canvasMode === 'tablet' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setCanvasMode('tablet')}
+                    aria-label="Tablet view"
+                  >
+                    <Tablet className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={canvasMode === 'mobile' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setCanvasMode('mobile')}
+                    aria-label="Mobile view"
+                  >
+                    <Smartphone className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  {widgets.length} widgets
+                </span>
+                <Button variant="ghost" size="sm" aria-label="Grid settings">
+                  <Grid className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="sm" aria-label="Layers panel">
+                  <Layers className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Canvas */}
+            <div 
+              className="flex-1 bg-gray-100 dark:bg-gray-800 overflow-auto p-8"
+              role="application"
+              aria-label="Widget canvas"
+            >
+              <div className="flex justify-center">
                 <motion.div
-                  key="registry"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="h-full"
+                  className="bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-gray-700 relative overflow-hidden"
+                  style={getCanvasSize()}
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <WidgetRegistry 
-                    onWidgetSelect={(widgetId) => {
-                      // Handle widget selection from registry
+                  {/* Canvas Grid */}
+                  <div 
+                    className="absolute inset-0 opacity-30"
+                    style={{
+                      backgroundImage: `
+                        radial-gradient(circle, #e5e7eb 1px, transparent 1px)
+                      `,
+                      backgroundSize: '20px 20px'
                     }}
                   />
-                </motion.div>
-              )}
 
-              {workspace.activePanel === 'blueprint' && (
-                <motion.div
-                  key="blueprint"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="h-full"
-                >
-                  <BlueprintDesigner 
-                    canvasId={workspace.canvasId}
-                  />
-                </motion.div>
-              )}
+                  {/* Widgets */}
+                  <AnimatePresence>
+                    {widgets.map((widget) => (
+                      <motion.div
+                        key={widget.id}
+                        className={`absolute cursor-move border-2 rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow ${
+                          selectedWidget === widget.id 
+                            ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800' 
+                            : 'border-gray-200 dark:border-gray-700'
+                        }`}
+                        style={{
+                          left: widget.x,
+                          top: widget.y,
+                          width: widget.width,
+                          height: widget.height
+                        }}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        onClick={() => setSelectedWidget(widget.id)}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`${widget.name} widget`}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setSelectedWidget(widget.id);
+                          }
+                        }}
+                      >
+                        <div className="p-3 h-full flex items-center justify-center">
+                          <div className="text-center">
+                            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center mx-auto mb-2">
+                              <BarChart3 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                            </div>
+                            <h4 className="font-medium text-sm text-gray-900 dark:text-white">
+                              {widget.name}
+                            </h4>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {widget.category}
+                            </p>
+                          </div>
+                        </div>
 
-              {workspace.activePanel === 'properties' && (
-                <motion.div
-                  key="properties"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="h-full"
-                >
-                  <PropertiesPanel 
-                    selectedWidgets={workspace.selectedWidgets}
-                    onPropertyChange={(widgetId, property, value) => {
-                      // Handle property changes
-                    }}
-                  />
+                        {/* Resize Handles */}
+                        {selectedWidget === widget.id && (
+                          <>
+                            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-blue-500 border border-white rounded-full cursor-se-resize" />
+                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 border border-white rounded-full cursor-ne-resize" />
+                            <div className="absolute -top-1 -left-1 w-3 h-3 bg-blue-500 border border-white rounded-full cursor-nw-resize" />
+                            <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-blue-500 border border-white rounded-full cursor-sw-resize" />
+                          </>
+                        )}
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+
+                  {/* Empty State */}
+                  {widgets.length === 0 && (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-center space-y-4">
+                        <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center mx-auto">
+                          <Palette className="h-8 w-8 text-gray-400" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                            Start Creating
+                          </h3>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+                            Drag widgets from the library to begin building your interface. 
+                            Collaborate in real-time with your team.
+                          </p>
+                        </div>
+                        <Button onClick={() => addWidget(widgetTemplates[0])}>
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Your First Widget
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </motion.div>
-              )}
-            </AnimatePresence>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Canvas Area */}
-        <div className="flex-1 relative bg-gray-100 dark:bg-gray-900">
-          <WidgetCanvas
-            ref={canvasRef}
-            canvasId={workspace.canvasId}
-            showGrid={workspace.showGrid}
-            snapToGrid={workspace.snapToGrid}
-            zoom={workspace.zoom}
-            selectedWidgets={workspace.selectedWidgets}
-            onSelectionChange={handleWidgetSelection}
-            onZoomChange={handleZoom}
-            className="w-full h-full"
-          />
+          {/* Properties Panel */}
+          <div className="w-80 border-l border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 overflow-y-auto">
+            <div className="p-4">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
+                Properties
+              </h3>
 
-          {/* Canvas Overlay - Zoom Controls */}
-          <div className="absolute bottom-4 right-4 flex flex-col space-y-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => handleZoom(1)}
-              className="shadow-lg"
-            >
-              100%
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => handleZoom(workspace.zoom * 1.25)}
-              className="shadow-lg"
-            >
-              <ZoomIn className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => handleZoom(workspace.zoom * 0.8)}
-              className="shadow-lg"
-            >
-              <ZoomOut className="h-4 w-4" />
-            </Button>
-          </div>
+              {selectedWidget ? (
+                <ErrorBoundary fallback={ComponentErrorFallback}>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="widget-name">Widget Name</Label>
+                      <Input
+                        id="widget-name"
+                        defaultValue={widgets.find(w => w.id === selectedWidget)?.name}
+                        aria-describedby="widget-name-desc"
+                      />
+                      <p id="widget-name-desc" className="text-xs text-gray-500 dark:text-gray-400">
+                        Display name for this widget
+                      </p>
+                    </div>
 
-          {/* Canvas Overlay - Grid Toggle */}
-          <div className="absolute bottom-4 left-4">
-            <Button
-              variant={workspace.showGrid ? "default" : "secondary"}
-              size="sm"
-              onClick={toggleGrid}
-              className="shadow-lg"
-            >
-              <Grid className="h-4 w-4 mr-2" />
-              {workspace.showGrid ? 'Hide Grid' : 'Show Grid'}
-            </Button>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="widget-width">Width</Label>
+                        <Input
+                          id="widget-width"
+                          type="number"
+                          defaultValue={widgets.find(w => w.id === selectedWidget)?.width}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="widget-height">Height</Label>
+                        <Input
+                          id="widget-height"
+                          type="number"
+                          defaultValue={widgets.find(w => w.id === selectedWidget)?.height}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Actions</Label>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" className="flex-1">
+                          <Download className="h-3 w-3 mr-2" />
+                          Export
+                        </Button>
+                        <Button variant="outline" size="sm" className="flex-1 text-red-600 hover:text-red-700">
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </ErrorBoundary>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <MousePointer className="h-6 w-6 text-gray-400" />
+                  </div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Select a widget to edit its properties
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 }

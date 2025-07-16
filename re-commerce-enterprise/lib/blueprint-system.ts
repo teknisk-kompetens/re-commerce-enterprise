@@ -946,7 +946,6 @@ export class BlueprintSystem {
           validation: blueprint.validation as any,
           inheritance: blueprint.inheritance as any,
           configuration: blueprint.configuration as any,
-          preview: blueprint.preview as any,
           metadata: blueprint.metadata as any,
           updatedAt: new Date(),
         },
@@ -964,9 +963,7 @@ export class BlueprintSystem {
           validation: blueprint.validation as any,
           inheritance: blueprint.inheritance as any,
           configuration: blueprint.configuration as any,
-          preview: blueprint.preview as any,
           metadata: blueprint.metadata as any,
-          tenantId: blueprint.metadata.tenantId,
         },
       });
     } catch (error) {

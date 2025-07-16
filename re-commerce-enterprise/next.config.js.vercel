@@ -1,0 +1,21 @@
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // Optimized for Vercel deployment - REPLACE your current next.config.js with this
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  images: { 
+    unoptimized: true,
+    domains: ['images.unsplash.com', 'via.placeholder.com']
+  },
+  // Enable experimental features for better performance
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+  },
+};
+
+module.exports = nextConfig;

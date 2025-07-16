@@ -558,7 +558,8 @@ async function getSystemHealth() {
 
 function calculateUptime(trends: any): string {
   // Simple uptime calculation based on trends
-  const avgHealth = Object.values(trends).reduce((sum: number, val: any) => sum + val, 0) / Object.keys(trends).length;
+  const values = Object.values(trends) as number[];
+  const avgHealth = values.length > 0 ? values.reduce((sum: number, val: number) => sum + (val || 0), 0) / values.length : 0;
   return (avgHealth / 100 * 100).toFixed(2) + '%';
 }
 

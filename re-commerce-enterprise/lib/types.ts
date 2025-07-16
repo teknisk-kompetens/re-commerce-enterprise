@@ -776,3 +776,343 @@ export interface ErrorDetails {
   stack?: string;
   context?: Record<string, any>;
 }
+
+// ===================================================================
+// INTERACTIVE DEMO BUILDER TYPES - Revolutionary Enterprise Feature
+// ===================================================================
+
+// Demo Builder Core Types
+export interface DemoProfile {
+  id: string;
+  name: string;
+  description?: string;
+  type: 'default' | 'custom' | 'template';
+  industry: string;
+  targetRole: string;
+  painPoints: string[];
+  focusAreas: string[];
+  duration: number;
+  interactive: boolean;
+  autoPlay: boolean;
+  personalization: Record<string, any>;
+  slides: DemoSlide[];
+  workflows: DemoWorkflowConfig[];
+  isActive: boolean;
+  isTemplate: boolean;
+  popularity: number;
+  lastUsed: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+  tenantId: string;
+}
+
+export interface DemoSlide {
+  id: string;
+  title: string;
+  description?: string;
+  content: string;
+  components: EnterpriseSystemComponent[];
+  interactions: DemoInteraction[];
+  duration?: number;
+  transitionType?: 'fade' | 'slide' | 'zoom';
+  background?: string;
+  layout?: 'full' | 'split' | 'grid';
+  aiPersonalization?: {
+    prompts: string[];
+    adaptations: Record<string, any>;
+  };
+}
+
+export interface EnterpriseSystemComponent {
+  id: string;
+  name: string;
+  title: string;
+  description: string;
+  category: 'ai' | 'security' | 'analytics' | 'integration' | 'management';
+  type: 'dashboard' | 'workflow' | 'feature' | 'integration';
+  icon: string;
+  color: string;
+  href?: string;
+  demoContent: Record<string, any>;
+  interactions: DemoInteraction[];
+  aiPrompts: string[];
+  usageCount: number;
+  rating: number;
+  isActive: boolean;
+  isHighlighted: boolean;
+  isPremium: boolean;
+}
+
+export interface DemoWorkflowConfig {
+  id: string;
+  name: string;
+  description?: string;
+  steps: DemoWorkflowStep[];
+  connections: DemoWorkflowConnection[];
+  variables: Record<string, any>;
+  industry?: string;
+  role?: string;
+  adaptations: Record<string, any>;
+  autoAdvance: boolean;
+  timing: Record<string, number>;
+  version: string;
+}
+
+export interface DemoWorkflowStep {
+  id: string;
+  name: string;
+  title: string;
+  description: string;
+  type: 'component' | 'interaction' | 'ai_response' | 'data_input' | 'decision';
+  componentId?: string;
+  config: Record<string, any>;
+  position: { x: number; y: number };
+  inputs: DemoWorkflowInput[];
+  outputs: DemoWorkflowOutput[];
+  aiPersonalization?: {
+    prompts: string[];
+    conditions: Record<string, any>;
+  };
+}
+
+export interface DemoWorkflowConnection {
+  id: string;
+  fromStep: string;
+  toStep: string;
+  condition?: string;
+  label?: string;
+}
+
+export interface DemoWorkflowInput {
+  id: string;
+  name: string;
+  type: 'text' | 'number' | 'boolean' | 'select' | 'multiselect';
+  required: boolean;
+  defaultValue?: any;
+  options?: Array<{ label: string; value: any }>;
+  validation?: {
+    min?: number;
+    max?: number;
+    pattern?: string;
+    message?: string;
+  };
+}
+
+export interface DemoWorkflowOutput {
+  id: string;
+  name: string;
+  type: 'data' | 'trigger' | 'redirect' | 'ai_response';
+  value?: any;
+  condition?: string;
+}
+
+// Demo Execution Types
+export interface DemoExecution {
+  id: string;
+  profileId: string;
+  executionId: string;
+  sessionId: string;
+  userId?: string;
+  userRole?: string;
+  userIndustry?: string;
+  userPainPoints: string[];
+  userFocusAreas: string[];
+  startedAt: Date;
+  completedAt?: Date;
+  currentStep: number;
+  totalSteps: number;
+  interactions: DemoInteractionEvent[];
+  feedbacks: DemoFeedback[];
+  aiResponses: DemoAIResponse[];
+  status: 'active' | 'completed' | 'abandoned' | 'paused';
+  satisfaction?: number;
+  completion: number;
+  personalizations: Record<string, any>;
+  duration?: number;
+  bouncePoints: DemoBouncePoint[];
+  engagementScore: number;
+}
+
+export interface DemoInteraction {
+  id: string;
+  name: string;
+  type: 'button' | 'form' | 'data_input' | 'api_call' | 'simulation';
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  endpoint?: string;
+  payload: Record<string, any>;
+  responseTemplate: Record<string, any>;
+  triggerConditions: Record<string, any>;
+  responseVariations: DemoResponseVariation[];
+  aiPrompt?: string;
+  personalize: boolean;
+}
+
+export interface DemoResponseVariation {
+  condition: string;
+  response: Record<string, any>;
+  aiEnhancement?: boolean;
+}
+
+export interface DemoInteractionEvent {
+  id: string;
+  timestamp: Date;
+  type: string;
+  elementId: string;
+  data: Record<string, any>;
+  response?: Record<string, any>;
+  duration: number;
+}
+
+export interface DemoFeedback {
+  id: string;
+  timestamp: Date;
+  type: 'rating' | 'comment' | 'suggestion' | 'issue';
+  rating?: number;
+  comment?: string;
+  elementId?: string;
+  helpful: boolean;
+}
+
+export interface DemoAIResponse {
+  id: string;
+  timestamp: Date;
+  prompt: string;
+  response: string;
+  confidence: number;
+  personalizationApplied: Record<string, any>;
+  processingTime: number;
+}
+
+export interface DemoBouncePoint {
+  stepId: string;
+  timestamp: Date;
+  reason?: string;
+  duration: number;
+}
+
+// User Personalization Types
+export interface UserPersonalizationProfile {
+  id: string;
+  userId?: string;
+  sessionId: string;
+  industry?: string;
+  role?: string;
+  company?: string;
+  companySize?: 'startup' | 'sme' | 'enterprise';
+  experience?: 'beginner' | 'intermediate' | 'expert';
+  painPoints: string[];
+  focusAreas: string[];
+  interests: string[];
+  previousDemos: string[];
+  preferences: Record<string, any>;
+  learningStyle?: 'visual' | 'hands-on' | 'analytical';
+  aiProfile: Record<string, any>;
+  confidence: number;
+}
+
+// Demo Analytics Types
+export interface DemoAnalytics {
+  id: string;
+  profileId: string;
+  date: Date;
+  period: 'daily' | 'weekly' | 'monthly';
+  totalExecutions: number;
+  completedExecutions: number;
+  abandonedExecutions: number;
+  averageDuration: number;
+  averageCompletion: number;
+  averageSatisfaction: number;
+  engagementRate: number;
+  conversionRate: number;
+  popularSteps: DemoPopularStep[];
+  dropOffPoints: DemoDropOffPoint[];
+  commonFeedback: DemoCommonFeedback[];
+  aiInsights: Record<string, any>;
+  recommendations: DemoRecommendation[];
+}
+
+export interface DemoPopularStep {
+  stepId: string;
+  stepName: string;
+  interactions: number;
+  averageTimeSpent: number;
+  satisfaction: number;
+}
+
+export interface DemoDropOffPoint {
+  stepId: string;
+  stepName: string;
+  dropOffRate: number;
+  commonReasons: string[];
+}
+
+export interface DemoCommonFeedback {
+  type: string;
+  content: string;
+  frequency: number;
+  sentiment: 'positive' | 'neutral' | 'negative';
+}
+
+export interface DemoRecommendation {
+  type: 'content' | 'flow' | 'personalization' | 'performance';
+  title: string;
+  description: string;
+  impact: 'low' | 'medium' | 'high';
+  effort: 'low' | 'medium' | 'high';
+  aiGenerated: boolean;
+}
+
+// Demo Builder UI Types
+export interface DemoBuilderState {
+  currentProfile?: DemoProfile;
+  isEditing: boolean;
+  draggedComponent?: EnterpriseSystemComponent;
+  selectedWorkflowStep?: DemoWorkflowStep;
+  previewMode: boolean;
+  presentationMode: boolean;
+  isPlaying: boolean;
+  currentSlide: number;
+  userPersonalization?: UserPersonalizationProfile;
+}
+
+export interface DemoBuilderAction {
+  type: 'SET_PROFILE' | 'UPDATE_SLIDE' | 'ADD_COMPONENT' | 'REMOVE_COMPONENT' | 
+        'START_PREVIEW' | 'STOP_PREVIEW' | 'START_PRESENTATION' | 'STOP_PRESENTATION' |
+        'NEXT_SLIDE' | 'PREVIOUS_SLIDE' | 'SET_PERSONALIZATION' | 'UPDATE_WORKFLOW';
+  payload?: any;
+}
+
+// Slideshow Remote Control Types
+export interface SlideshowRemoteControl {
+  isActive: boolean;
+  currentSlide: number;
+  totalSlides: number;
+  isPlaying: boolean;
+  autoAdvance: boolean;
+  timing: Record<string, number>;
+  controls: {
+    play: () => void;
+    pause: () => void;
+    next: () => void;
+    previous: () => void;
+    goToSlide: (index: number) => void;
+    setAutoAdvance: (enabled: boolean) => void;
+  };
+}
+
+// AI Personalization Engine Types
+export interface AIPersonalizationRequest {
+  userProfile: UserPersonalizationProfile;
+  demoProfile: DemoProfile;
+  currentStep?: string;
+  context?: Record<string, any>;
+}
+
+export interface AIPersonalizationResponse {
+  personalizedContent: Record<string, any>;
+  adaptations: Record<string, any>;
+  confidence: number;
+  reasoning: string;
+  suggestions: string[];
+}

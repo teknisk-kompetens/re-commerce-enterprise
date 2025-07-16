@@ -700,6 +700,264 @@ model JITAccessRequest {
   @@map("jit_access_requests")
 }
 
+// ===================================================================
+// INTERACTIVE DEMO BUILDER SYSTEM - Revolutionary Enterprise Feature
+// ===================================================================
+
+// Demo Profile Management
+model DemoProfile {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  type        String   @default("custom") // "default", "custom", "template"
+  industry    String   // "banking", "retail", "healthcare", "manufacturing", etc.
+  targetRole  String   // "executive", "manager", "analyst", "developer", etc.
+  painPoints  Json     @default("[]") // Array of pain points this demo addresses
+  focusAreas  Json     @default("[]") // Array of focus areas
+  
+  // Demo Configuration
+  duration    Int      @default(15) // Duration in minutes
+  interactive Boolean  @default(true)
+  autoPlay    Boolean  @default(false)
+  
+  // Personalization Settings
+  personalization Json @default("{}")
+  
+  // Demo Content
+  slides      Json     @default("[]") // Array of slide configurations
+  workflows   Json     @default("[]") // Array of workflow configurations
+  
+  // Metadata
+  isActive    Boolean  @default(true)
+  isTemplate  Boolean  @default(false)
+  popularity  Int      @default(0)
+  lastUsed    DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String
+  tenantId    String
+  
+  // Relations
+  demoWorkflows DemoWorkflow[]
+  executions    DemoExecution[]
+  analytics     DemoAnalytics[]
+  
+  @@map("demo_profiles")
+}
+
+// Enterprise System Sections/Actions as Reusable Components
+model EnterpriseSystemComponent {
+  id            String   @id @default(cuid())
+  name          String
+  title         String
+  description   String
+  category      String   // "ai", "security", "analytics", "integration", "management"
+  type          String   // "dashboard", "workflow", "feature", "integration"
+  
+  // Component Configuration
+  icon          String   // Lucide icon name
+  color         String   // Theme color
+  href          String?  // Optional link destination
+  
+  // Demo Integration
+  demoContent   Json     @default("{}") // Content for demo presentation
+  interactions  Json     @default("[]") // Available interactions (GET/POST)
+  aiPrompts     Json     @default("[]") // AI prompts for personalization
+  
+  // Metrics
+  usageCount    Int      @default(0)
+  rating        Float    @default(0.0)
+  
+  // Status
+  isActive      Boolean  @default(true)
+  isHighlighted Boolean  @default(false)
+  isPremium     Boolean  @default(false)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@map("enterprise_system_components")
+}
+
+// Workflow Builder System
+model DemoWorkflow {
+  id          String   @id @default(cuid())
+  profileId   String?
+  profile     DemoProfile? @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  name        String
+  description String?
+  
+  // Workflow Structure
+  steps       Json     @default("[]") // Array of workflow steps
+  connections Json     @default("[]") // Step connections/flow
+  variables   Json     @default("{}") // Dynamic variables
+  
+  // Personalization
+  industry    String?
+  role        String?
+  adaptations Json     @default("{}") // AI adaptations based on user input
+  
+  // Execution Settings
+  autoAdvance Boolean  @default(false)
+  timing      Json     @default("{}") // Timing settings for each step
+  
+  // Status
+  isActive    Boolean  @default(true)
+  version     String   @default("1.0")
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String
+  
+  @@map("demo_workflows")
+}
+
+// Demo Execution Tracking
+model DemoExecution {
+  id          String   @id @default(cuid())
+  profileId   String
+  profile     DemoProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  // Execution Details
+  executionId String   @unique
+  sessionId   String
+  
+  // User Context
+  userId      String?
+  userRole    String?
+  userIndustry String?
+  userPainPoints Json  @default("[]")
+  userFocusAreas Json  @default("[]")
+  
+  // Execution Data
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  currentStep Int      @default(0)
+  totalSteps  Int      @default(0)
+  
+  // Interaction Data
+  interactions Json    @default("[]") // User interactions during demo
+  feedbacks   Json     @default("[]") // User feedback
+  aiResponses Json     @default("[]") // AI-generated responses
+  
+  // Results
+  status      String   @default("active") // "active", "completed", "abandoned", "paused"
+  satisfaction Float?   // User satisfaction score (1-5)
+  completion  Float    @default(0.0) // Completion percentage
+  
+  // Personalization Applied
+  personalizations Json @default("{}") // Applied personalizations
+  
+  // Analytics
+  duration    Int?     // Duration in seconds
+  bouncePoints Json   @default("[]") // Points where users dropped off
+  engagementScore Float @default(0.0)
+  
+  createdAt   DateTime @default(now())
+  
+  @@map("demo_executions")
+}
+
+// Demo Analytics and Performance
+model DemoAnalytics {
+  id          String   @id @default(cuid())
+  profileId   String
+  profile     DemoProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  // Time Period
+  date        DateTime @default(now())
+  period      String   // "daily", "weekly", "monthly"
+  
+  // Usage Metrics
+  totalExecutions Int @default(0)
+  completedExecutions Int @default(0)
+  abandonedExecutions Int @default(0)
+  averageDuration Float @default(0.0)
+  
+  // Performance Metrics
+  averageCompletion Float @default(0.0)
+  averageSatisfaction Float @default(0.0)
+  engagementRate Float @default(0.0)
+  conversionRate Float @default(0.0)
+  
+  // Popular Elements
+  popularSteps Json @default("[]")
+  dropOffPoints Json @default("[]")
+  commonFeedback Json @default("[]")
+  
+  // AI Insights
+  aiInsights Json @default("{}")
+  recommendations Json @default("[]")
+  
+  @@unique([profileId, date, period])
+  @@map("demo_analytics")
+}
+
+// User Personalization Profiles
+model UserPersonalizationProfile {
+  id            String   @id @default(cuid())
+  userId        String?
+  sessionId     String   // For anonymous users
+  
+  // User Characteristics
+  industry      String?
+  role          String?
+  company       String?
+  companySize   String?  // "startup", "sme", "enterprise"
+  experience    String?  // "beginner", "intermediate", "expert"
+  
+  // Preferences
+  painPoints    Json     @default("[]")
+  focusAreas    Json     @default("[]")
+  interests     Json     @default("[]")
+  
+  // Behavioral Data
+  previousDemos Json     @default("[]")
+  preferences   Json     @default("{}")
+  learningStyle String?  // "visual", "hands-on", "analytical"
+  
+  // AI Profile
+  aiProfile     Json     @default("{}")
+  confidence    Float    @default(0.0)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@unique([userId])
+  @@unique([sessionId])
+  @@map("user_personalization_profiles")
+}
+
+// Interactive Elements for GET/POST functionality
+model DemoInteractiveElement {
+  id          String   @id @default(cuid())
+  componentId String   // Reference to EnterpriseSystemComponent
+  
+  name        String
+  type        String   // "button", "form", "data_input", "api_call", "simulation"
+  method      String   // "GET", "POST", "PUT", "DELETE"
+  
+  // Configuration
+  endpoint    String?  // API endpoint or action
+  payload     Json     @default("{}")
+  responseTemplate Json @default("{}")
+  
+  // Demo Integration
+  triggerConditions Json @default("{}")
+  responseVariations Json @default("[]") // Different responses based on user input
+  
+  // AI Enhancement
+  aiPrompt    String?  // Prompt for AI-generated responses
+  personalize Boolean  @default(true)
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("demo_interactive_elements")
+}
+
 model PrivilegedAccount {
   id           String   @id @default(cuid())
   userId       String

@@ -3,12 +3,13 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
+import { EnterpriseLayoutWrapper } from '@/components/enterprise-layout-wrapper'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Re-Commerce Enterprise - Day 5 Complete Platform',
-  description: 'Complete enterprise transformation with production-ready system health monitoring, documentation center, go-live preparation, and executive intelligence dashboard',
+  title: 'Re-Commerce Enterprise - Cinematic Scene Experience',
+  description: 'Enterprise-grade platform with accessibility-first design, dark mode support, and immersive scene-based navigation',
 }
 
 export default function RootLayout({
@@ -25,7 +26,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <EnterpriseLayoutWrapper>
+            {children}
+          </EnterpriseLayoutWrapper>
           <Toaster position="top-right" />
         </ThemeProvider>
       </body>
