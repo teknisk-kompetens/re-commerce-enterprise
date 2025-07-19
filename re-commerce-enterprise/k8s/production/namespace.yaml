@@ -1,8 +1,0 @@
-
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: re-commerce-enterprise
-  labels:
-    name: re-commerce-enterprise
-    environment: production

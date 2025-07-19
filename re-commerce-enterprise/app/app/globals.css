@@ -1,0 +1,381 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@layer base {
+  :root {
+    /* Dark Studio Framework - Premium Colors */
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #121212;
+    --bg-tertiary: #1a1a1a;
+    
+    /* re:Commerce Brand Colors */
+    --brand-blue: #4F7FFF;
+    --brand-blue-light: #6B93FF;
+    --brand-blue-dark: #3B5FE5;
+    
+    /* Swedish Flag Colors */
+    --swedish-blue: #006AA7;
+    --swedish-yellow: #FECC02;
+    --swedish-blue-light: #0A7BC4;
+    --swedish-blue-dark: #004B7A;
+    
+    /* Glassmorphism Variables */
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-bg-hover: rgba(255, 255, 255, 0.06);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-blur: 12px;
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --glass-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.5);
+    
+    /* Text Colors */
+    --text-primary: #E8E8E8;
+    --text-secondary: #B0B0B0;
+    --text-muted: #808080;
+    
+    /* Success/Status Colors */
+    --success: #00FF85;
+    --warning: #FFB020;
+    --error: #FF6B6B;
+    
+    /* Chart Colors */
+    --chart-1: #60B5FF;
+    --chart-2: #FF9149;
+    --chart-3: #FF9898;
+    --chart-4: #FF90BB;
+    --chart-5: #80D8C3;
+    
+    /* Standard variables for compatibility */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --radius: 16px;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    
+    /* Dynamic gradient background */
+    background-image: 
+      radial-gradient(circle at 20% 20%, rgba(79, 127, 255, 0.15), transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(79, 127, 255, 0.1), transparent 35%),
+      radial-gradient(circle at 60% 40%, rgba(79, 127, 255, 0.05), transparent 50%);
+  }
+}
+
+/* Glassmorphism Components */
+@layer components {
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: var(--radius);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .glass-card:hover {
+    background: var(--glass-bg-hover);
+    box-shadow: var(--glass-shadow-hover);
+    transform: translateY(-2px);
+  }
+  
+  .glass-sidebar {
+    background: rgba(18, 18, 20, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-right: 1px solid var(--glass-border);
+    position: relative;
+  }
+  
+  .glass-sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--brand-blue), var(--brand-blue-dark));
+  }
+  
+  .glass-hero {
+    background: linear-gradient(
+      135deg,
+      rgba(79, 127, 255, 0.1) 0%,
+      rgba(59, 95, 229, 0.05) 50%,
+      transparent 100%
+    );
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(79, 127, 255, 0.2);
+  }
+  
+  /* Custom Button Styles */
+  .btn-primary {
+    background: linear-gradient(135deg, var(--brand-blue), var(--brand-blue-dark));
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(79, 127, 255, 0.3);
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(79, 127, 255, 0.4);
+    background: linear-gradient(135deg, var(--brand-blue-light), var(--brand-blue));
+  }
+  
+  .btn-glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-glass:hover {
+    background: var(--glass-bg-hover);
+    transform: translateY(-1px);
+  }
+  
+  /* Typography Scale */
+  .text-hero {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  
+  .text-section {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  
+  .text-card {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  
+  /* Animations */
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+  
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 20px rgba(79, 127, 255, 0.3);
+    }
+    to {
+      box-shadow: 0 0 30px rgba(79, 127, 255, 0.6);
+    }
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.8s ease-out forwards;
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  
+  @keyframes slideUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Counter Animation */
+  .counter {
+    animation: countUp 2s ease-out;
+  }
+  
+  /* Gradient Text */
+  .gradient-text {
+    background: linear-gradient(135deg, var(--brand-blue), var(--brand-blue-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Swedish Market Styling */
+  .swedish-accent {
+    color: var(--swedish-yellow);
+  }
+  
+  .swedish-gradient {
+    background: linear-gradient(135deg, var(--swedish-blue), var(--swedish-blue-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .compliance-badge {
+    background: linear-gradient(135deg, 
+      rgba(0, 106, 167, 0.2), 
+      rgba(254, 204, 2, 0.1)
+    );
+    border: 1px solid var(--swedish-blue);
+    color: var(--swedish-blue-light);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .ecosystem-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-left: 4px solid var(--swedish-blue);
+    box-shadow: var(--glass-shadow);
+    border-radius: var(--radius);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .ecosystem-card:hover {
+    background: var(--glass-bg-hover);
+    box-shadow: 0 12px 40px rgba(0, 106, 167, 0.2);
+    transform: translateY(-2px);
+    border-left-color: var(--swedish-yellow);
+  }
+  
+  .investor-highlight {
+    background: linear-gradient(135deg, 
+      rgba(79, 127, 255, 0.1), 
+      rgba(0, 106, 167, 0.1)
+    );
+    border: 1px solid rgba(79, 127, 255, 0.3);
+    padding: 24px;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .investor-highlight::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, 
+      var(--swedish-blue), 
+      var(--swedish-yellow), 
+      var(--swedish-blue)
+    );
+  }
+  
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--brand-blue);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--brand-blue-light);
+  }
+  
+  /* Remove focus outline for mouse users */
+  .focus-visible:focus {
+    outline: 2px solid var(--brand-blue);
+    outline-offset: 2px;
+  }
+  
+  /* Reduce motion for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Loading States */
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--glass-bg) 25%,
+    var(--glass-bg-hover) 50%,
+    var(--glass-bg) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
