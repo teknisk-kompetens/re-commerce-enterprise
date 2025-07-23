@@ -1,28 +1,20 @@
-export type Expense = {
-  id: string
-  amount: number
-  category: string
-  description: string
-  date: Date
+
+export interface ContactSubmission {
+  id: number
+  name: string
+  email: string
+  company?: string
+  message: string
+  formType: 'contact' | 'demo' | 'interest' | 'pilot'
+  status: 'new' | 'contacted' | 'qualified' | 'closed'
+  createdAt: Date
+  updatedAt: Date
 }
 
-export type ExpenseFormData = Omit<Expense, 'id' | 'date'> & {
-  date: string
-}
-
-export const EXPENSE_CATEGORIES = [
-  'Food',
-  'Transportation',
-  'Housing',
-  'Utilities',
-  'Entertainment',
-  'Healthcare',
-  'Shopping',
-  'Education',
-  'Other'
-] as const
-
-export type DateRange = {
-  from: Date | undefined
-  to: Date | undefined
+export interface ContactFormData {
+  name: string
+  email: string
+  company: string
+  message: string
+  formType: string
 }

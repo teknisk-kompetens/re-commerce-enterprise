@@ -1,10 +1,85 @@
 generator client {
     provider = "prisma-client-js"
     binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
-    output = "/home/ubuntu/campaign-4in1-magical/app/node_modules/.prisma/client"
+    output = "/home/ubuntu/new-re-commerce/app/node_modules/.prisma/client"
 }
 
 datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
+}
+
+model ContactSubmission {
+  id          Int      @id @default(autoincrement())
+  name        String
+  email       String
+  phone       String?
+  company     String?
+  message     String
+  formType    String   @default("contact") // contact, demo, interest, pilot
+  status      String   @default("new")     // new, contacted, qualified, closed
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("contact_submissions")
+}
+
+model Platform {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  description String
+  status      String   @default("coming_soon") // coming_soon, pilot, available
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  features    Feature[]
+  interests   PlatformInterest[]
+
+  @@map("platforms")
+}
+
+model Feature {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  category    String
+  priority    String   @default("medium") // low, medium, high
+  platformId  Int
+  platform    Platform @relation(fields: [platformId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  votes       FeatureVote[]
+
+  @@map("features")
+}
+
+model FeatureVote {
+  id        Int      @id @default(autoincrement())
+  sessionId String
+  featureId Int
+  voteType  String   // dislike, like, love
+  feature   Feature  @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sessionId, featureId])
+  @@map("feature_votes")
+}
+
+model PlatformInterest {
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String
+  phone      String?
+  company    String?
+  message    String?
+  platformId Int
+  platform   Platform @relation(fields: [platformId], references: [id], onDelete: Cascade)
+  status     String   @default("new") // new, contacted, qualified, closed
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("platform_interests")
 }
