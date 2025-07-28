@@ -1,0 +1,17 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: re-commerce-enterprise
+  namespace: re-commerce-enterprise
+  labels:
+    app: re-commerce-enterprise
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  selector:
+    app: re-commerce-enterprise
