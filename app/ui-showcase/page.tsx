@@ -32,7 +32,7 @@ import { Button } from '@/components/ui/button-enhanced';
 import { Input } from '@/components/ui/input-enhanced';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card-enhanced';
 import { LoadingSpinner, Skeleton, Progress, LoadingState } from '@/components/ui/loading-enhanced';
-import { useToast, toast } from '@/components/ui/toast-enhanced';
+import { useToast, toast, ToastProvider } from '@/components/ui/toast-enhanced';
 import { Modal, ConfirmationModal, AlertModal, useModal } from '@/components/ui/modal-enhanced';
 import { Alert, Banner, Callout, FeedbackWidget, HelpTooltip } from '@/components/ui/feedback-enhanced';
 import { EnhancedForm, FormField, FormSection, FormActions, MultiStepForm } from '@/components/ui/form-enhanced';
@@ -47,7 +47,7 @@ const demoFormSchema = z.object({
   message: z.string().min(10, 'Message must be at least 10 characters')
 });
 
-export default function UIShowcasePage() {
+function UIShowcasePageContent() {
   const { addToast } = useToast();
   const { theme, setTheme, contrastMode, setContrastMode, motionMode, setMotionMode, fontScale, setFontScale, density, setDensity } = useEnhancedTheme();
   const { isDark, isHighContrast, isReducedMotion } = useThemeAwareStyles();
@@ -626,5 +626,13 @@ export default function UIShowcasePage() {
         variant="info"
       />
     </ResponsiveLayout>
+  );
+}
+
+export default function UIShowcasePage() {
+  return (
+    <ToastProvider>
+      <UIShowcasePageContent />
+    </ToastProvider>
   );
 }

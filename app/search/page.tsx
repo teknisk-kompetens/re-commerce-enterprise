@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -43,7 +43,7 @@ const typeIcons = {
   'documentation': FileText
 };
 
-export default function SearchPage() {
+function SearchPageContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
   
@@ -432,5 +432,13 @@ function SearchResultCard({ result, index, viewMode }: SearchResultCardProps) {
         </Card>
       </Link>
     </motion.div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto py-8 px-4"><div className="text-center">Laddar sökresultat...</div></div>}>
+      <SearchPageContent />
+    </Suspense>
   );
 }
