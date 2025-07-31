@@ -2,118 +2,142 @@
 "use client";
 
 import { useState } from 'react';
-import Image from 'next/image';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Shield, Users, Brain } from 'lucide-react';
+import { 
+  Search, 
+  Menu, 
+  X, 
+  Brain, 
+  BarChart3, 
+  Users, 
+  Settings,
+  LogIn,
+  UserPlus
+} from 'lucide-react';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
+  const navigation = [
+    { name: 'Search', href: '/', icon: Search },
+    { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+    { name: 'AI Assistants', href: '/consciousnesses', icon: Brain },
+    { name: 'Community', href: '/community', icon: Users },
+    { name: 'Enterprise', href: '/enterprise', icon: Settings }
+  ];
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container max-w-7xl mx-auto flex h-16 items-center justify-between px-4">
-        {/* Logo */}
-        <Link href="/" className="flex items-center space-x-3">
-          <div className="relative w-12 h-8">
-            <Image
-              src="https://cdn.abacus.ai/images/6d229b87-5c7f-4b45-9676-c5557063f842.png"
-              alt="Mr. RE:commerce"
-              fill
-              className="object-contain"
-            />
-          </div>
-          <span className="font-bold text-xl">CaaS Platform</span>
-        </Link>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
-          <Link href="/" className="text-foreground/80 hover:text-foreground transition-colors">
-            Hem
-          </Link>
-          <Link href="/consciousnesses" className="text-foreground/80 hover:text-foreground transition-colors flex items-center gap-2">
-            <Brain className="w-4 h-4" />
-            Medvetanden
-          </Link>
-          <Link href="/security" className="text-foreground/80 hover:text-foreground transition-colors flex items-center gap-2">
-            <Shield className="w-4 h-4" />
-            Säkerhet
-          </Link>
-          <Link href="/about" className="text-foreground/80 hover:text-foreground transition-colors flex items-center gap-2">
-            <Users className="w-4 h-4" />
-            Om Oss
-          </Link>
-        </nav>
-
-        {/* CTA Button */}
-        <div className="hidden md:flex items-center space-x-4">
-          <Button variant="outline" asChild>
-            <Link href="/demo">Demo</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/contact">Kontakt</Link>
-          </Button>
-        </div>
-
-        {/* Mobile Menu Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={toggleMenu}
-        >
-          {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </Button>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden border-t border-border/40 bg-background/95 backdrop-blur">
-          <nav className="container max-w-7xl mx-auto px-4 py-4 space-y-4">
-            <Link
-              href="/"
-              className="block text-foreground/80 hover:text-foreground transition-colors"
-              onClick={toggleMenu}
-            >
-              Hem
-            </Link>
-            <Link
-              href="/consciousnesses"
-              className="block text-foreground/80 hover:text-foreground transition-colors flex items-center gap-2"
-              onClick={toggleMenu}
-            >
-              <Brain className="w-4 h-4" />
-              Medvetanden
-            </Link>
-            <Link
-              href="/security"
-              className="block text-foreground/80 hover:text-foreground transition-colors flex items-center gap-2"
-              onClick={toggleMenu}
-            >
-              <Shield className="w-4 h-4" />
-              Säkerhet
-            </Link>
-            <Link
-              href="/about"
-              className="block text-foreground/80 hover:text-foreground transition-colors flex items-center gap-2"
-              onClick={toggleMenu}
-            >
-              <Users className="w-4 h-4" />
-              Om Oss
-            </Link>
-            <div className="pt-4 space-y-2">
-              <Button variant="outline" className="w-full" asChild>
-                <Link href="/demo" onClick={toggleMenu}>Demo</Link>
-              </Button>
-              <Button className="w-full" asChild>
-                <Link href="/contact" onClick={toggleMenu}>Kontakt</Link>
-              </Button>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
+      <div className="container max-w-7xl mx-auto px-4">
+        <div className="flex h-16 items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <div className="relative w-10 h-10 rounded overflow-hidden">
+              <Image
+                src="https://cdn.abacus.ai/images/a2218700-1838-46ec-852c-1e54360fe2ab.png"
+                alt="Mr. RE:commerce Logo"
+                fill
+                className="object-cover"
+                priority
+              />
             </div>
+            <div className="hidden sm:block">
+              <div className="font-bold text-lg bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+                Mr. RE:commerce
+              </div>
+              <div className="text-xs text-muted-foreground -mt-1">
+                Intelligent Search Platform
+              </div>
+            </div>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-1">
+            {navigation.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Button key={item.name} variant="ghost" asChild className="gap-2">
+                  <Link href={item.href}>
+                    <Icon className="w-4 h-4" />
+                    {item.name}
+                  </Link>
+                </Button>
+              );
+            })}
           </nav>
+
+          {/* Auth Buttons */}
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" asChild className="hidden sm:flex gap-2">
+              <Link href="/auth/login">
+                <LogIn className="w-4 h-4" />
+                Login
+              </Link>
+            </Button>
+            <Button size="sm" asChild className="gap-2">
+              <Link href="/auth/signup">
+                <UserPlus className="w-4 h-4" />
+                <span className="hidden sm:inline">Sign Up</span>
+              </Link>
+            </Button>
+
+            {/* Mobile Menu Toggle */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden"
+              onClick={toggleMenu}
+            >
+              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </Button>
+          </div>
         </div>
-      )}
+
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden border-t py-4"
+          >
+            <nav className="flex flex-col gap-2">
+              {navigation.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Button
+                    key={item.name}
+                    variant="ghost"
+                    asChild
+                    className="justify-start gap-3"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Link href={item.href}>
+                      <Icon className="w-4 h-4" />
+                      {item.name}
+                    </Link>
+                  </Button>
+                );
+              })}
+              
+              {/* Mobile Auth */}
+              <div className="border-t pt-2 mt-2">
+                <Button variant="ghost" asChild className="justify-start gap-3 w-full">
+                  <Link href="/auth/login" onClick={() => setIsMenuOpen(false)}>
+                    <LogIn className="w-4 h-4" />
+                    Login
+                  </Link>
+                </Button>
+              </div>
+            </nav>
+          </motion.div>
+        )}
+      </div>
     </header>
   );
 }

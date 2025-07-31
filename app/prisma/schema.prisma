@@ -1,3 +1,4 @@
+// Mr. RE:commerce Enterprise Platform Schema
 generator client {
     provider = "prisma-client-js"
     binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
@@ -7,4 +8,261 @@ generator client {
 datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
+}
+
+// Enterprise User Management
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  role      Role     @default(USER)
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+  
+  // Activity tracking
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lastLogin DateTime?
+  
+  // User relationships
+  searchQueries SearchQuery[]
+  votes         Vote[]
+  comments      Comment[]
+  bookmarks     Bookmark[]
+  
+  @@map("users")
+}
+
+// Multi-tenant Company Support
+model Company {
+  id          String   @id @default(cuid())
+  name        String
+  domain      String   @unique
+  plan        Plan     @default(BASIC)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Company relationships
+  users       User[]
+  analytics   Analytics[]
+  
+  @@map("companies")
+}
+
+// Search Content (Reddit/StackOverflow style)
+model SearchContent {
+  id          String      @id @default(cuid())
+  title       String
+  content     String
+  excerpt     String?
+  type        ContentType @default(DISCUSSION)
+  status      Status      @default(ACTIVE)
+  
+  // SEO and Discovery
+  slug        String      @unique
+  metaTitle   String?
+  metaDesc    String?
+  
+  // Engagement metrics
+  views       Int         @default(0)
+  upvotes     Int         @default(0)
+  downvotes   Int         @default(0)
+  score       Float       @default(0.0)
+  
+  // Timestamps
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  publishedAt DateTime?
+  
+  // Relationships
+  categoryId  String?
+  category    Category?   @relation(fields: [categoryId], references: [id])
+  tags        Tag[]       @relation("ContentTags")
+  votes       Vote[]
+  comments    Comment[]
+  bookmarks   Bookmark[]
+  queries     SearchQuery[] @relation("QueryResults")
+  
+  @@map("search_content")
+}
+
+// Search Queries and History
+model SearchQuery {
+  id            String    @id @default(cuid())
+  query         String
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id])
+  
+  // Search metadata
+  filters       Json?
+  sortBy        String    @default("relevance")
+  resultsCount  Int       @default(0)
+  
+  // AI assistance
+  aiAssistance  Boolean   @default(false)
+  consciousnessId String?
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  
+  // Results
+  results       SearchContent[] @relation("QueryResults")
+  
+  @@map("search_queries")
+}
+
+// Categorization System
+model Category {
+  id          String          @id @default(cuid())
+  name        String
+  slug        String          @unique
+  description String?
+  color       String          @default("#6B7280")
+  icon        String?
+  parentId    String?
+  parent      Category?       @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[]      @relation("CategoryHierarchy")
+  
+  // Metrics
+  contentCount Int            @default(0)
+  
+  // Timestamps
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  
+  // Relationships
+  content     SearchContent[]
+  
+  @@map("categories")
+}
+
+// Tag System
+model Tag {
+  id          String          @id @default(cuid())
+  name        String          @unique
+  slug        String          @unique
+  description String?
+  color       String          @default("#3B82F6")
+  
+  // Usage metrics
+  usageCount  Int             @default(0)
+  
+  // Timestamps
+  createdAt   DateTime        @default(now())
+  
+  // Relationships
+  content     SearchContent[] @relation("ContentTags")
+  
+  @@map("tags")
+}
+
+// Voting System (Reddit-style)
+model Vote {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  contentId String
+  content   SearchContent @relation(fields: [contentId], references: [id])
+  type      VoteType
+  
+  createdAt DateTime      @default(now())
+  
+  @@unique([userId, contentId])
+  @@map("votes")
+}
+
+// Comment System
+model Comment {
+  id        String        @id @default(cuid())
+  content   String
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  contentId String
+  searchContent SearchContent @relation(fields: [contentId], references: [id])
+  
+  // Nested comments
+  parentId  String?
+  parent    Comment?      @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[]     @relation("CommentReplies")
+  
+  // Metrics
+  upvotes   Int           @default(0)
+  downvotes Int           @default(0)
+  
+  // Timestamps
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  
+  @@map("comments")
+}
+
+// Bookmark/Favorites System
+model Bookmark {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  contentId String
+  content   SearchContent @relation(fields: [contentId], references: [id])
+  
+  createdAt DateTime      @default(now())
+  
+  @@unique([userId, contentId])
+  @@map("bookmarks")
+}
+
+// Enterprise Analytics
+model Analytics {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  
+  // Metrics
+  date        DateTime
+  searches    Int      @default(0)
+  users       Int      @default(0)
+  content     Int      @default(0)
+  engagement  Float    @default(0.0)
+  
+  // Additional data
+  metadata    Json?
+  
+  @@unique([companyId, date])
+  @@map("analytics")
+}
+
+// Enums
+enum Role {
+  USER
+  ADMIN
+  ENTERPRISE
+  SUPER_ADMIN
+}
+
+enum Plan {
+  BASIC
+  PREMIUM
+  ENTERPRISE
+}
+
+enum ContentType {
+  DISCUSSION
+  QUESTION
+  ARTICLE
+  TUTORIAL
+  NEWS
+  REVIEW
+}
+
+enum Status {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+  DELETED
+}
+
+enum VoteType {
+  UP
+  DOWN
 }
