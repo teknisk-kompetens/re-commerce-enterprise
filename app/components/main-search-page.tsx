@@ -1,304 +1,278 @@
 
-"use client";
+'use client';
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import SearchInterface from '@/components/search-interface';
-import SearchResults from '@/components/search-results';
-import { SearchResult, SearchFilters } from '@/lib/types';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, Users, Zap, Brain, Sparkles } from 'lucide-react';
-import { AI_CONSCIOUSNESSES } from '@/lib/consciousness-data';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Search, Sparkles, Zap, Users, TrendingUp, Database, BarChart3, MessageSquare } from 'lucide-react';
+import SearchResults from '@/components/search-results';
+import PowerModeStatus from '@/components/powermode-status';
+import { getPowerModeInstance, activatePowerMode } from '@/lib/powermode-honest';
+import { SearchResult } from '@/lib/types';
 
 export default function MainSearchPage() {
+  const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [currentQuery, setCurrentQuery] = useState('');
-  const [hasSearched, setHasSearched] = useState(false);
-  const [aiInsights, setAiInsights] = useState<string>('');
-  const [showAiInsights, setShowAiInsights] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [powerModeActive, setPowerModeActive] = useState(false);
 
-  const handleSearch = async (query: string, filters?: SearchFilters) => {
-    setLoading(true);
-    setCurrentQuery(query);
-    setHasSearched(true);
-    setShowAiInsights(false);
-    setAiInsights('');
+  useEffect(() => {
+    // Check if PowerMode is active on mount
+    const powerMode = getPowerModeInstance();
+    setPowerModeActive(powerMode.isActiveMode());
+  }, []);
 
-    try {
-      // Perform search
-      const searchResponse = await fetch('/api/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query,
-          filters,
-          aiAssistance: filters?.aiAssistance,
-          consciousnessId: filters?.consciousnessId
-        })
+  const handleSearch = async (query?: string) => {
+    const searchTerm = query || searchQuery;
+    if (!searchTerm.trim()) return;
+
+    setIsSearching(true);
+    
+    // Simulate search delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Mock search results - in real app, this would call an API
+    const mockResults: SearchResult[] = [
+      {
+        id: '1',
+        title: 'Enterprise Dashboard Analytics',
+        content: 'Comprehensive analytics dashboard for enterprise data visualization and insights.',
+        excerpt: 'Analytics dashboard for enterprise data visualization.',
+        type: 'ARTICLE',
+        slug: 'enterprise-dashboard-analytics',
+        score: 95,
+        views: 1250,
+        upvotes: 42,
+        downvotes: 2,
+        createdAt: new Date(),
+        tags: [{ id: '1', name: 'analytics', slug: 'analytics', color: '#3B82F6', usageCount: 125 }],
+        commentsCount: 15
+      },
+      {
+        id: '2', 
+        title: 'AI-Powered Search Documentation',
+        content: 'Documentation for implementing AI-powered search capabilities in enterprise applications.',
+        excerpt: 'AI-powered search implementation guide.',
+        type: 'TUTORIAL',
+        slug: 'ai-powered-search-documentation',
+        score: 88,
+        views: 890,
+        upvotes: 35,
+        downvotes: 1,
+        createdAt: new Date(),
+        tags: [{ id: '2', name: 'ai-search', slug: 'ai-search', color: '#10B981', usageCount: 89 }],
+        commentsCount: 8
+      },
+      {
+        id: '3',
+        title: 'User Management System',
+        content: 'Complete user management and authentication system with role-based access control.',
+        excerpt: 'User management with role-based access.',
+        type: 'DISCUSSION',
+        slug: 'user-management-system',
+        score: 82,
+        views: 654,
+        upvotes: 28,
+        downvotes: 3,
+        createdAt: new Date(),
+        tags: [{ id: '3', name: 'user-management', slug: 'user-management', color: '#F59E0B', usageCount: 67 }],
+        commentsCount: 12
+      }
+    ];
+
+    setSearchResults(mockResults);
+    setIsSearching(false);
+
+    // If PowerMode is active, create workflow for search
+    if (powerModeActive) {
+      const powerMode = getPowerModeInstance();
+      await powerMode.organizeWorkflow(`Search and analyze: ${searchTerm}`, {
+        searchTerm,
+        resultCount: mockResults.length,
+        timestamp: new Date().toISOString()
       });
-
-      if (!searchResponse.ok) {
-        throw new Error('Search failed');
-      }
-
-      const searchData = await searchResponse.json();
-      setSearchResults(searchData.results || []);
-
-      // If AI assistance is requested, get AI insights
-      if (filters?.aiAssistance && filters?.consciousnessId) {
-        setShowAiInsights(true);
-        
-        const aiResponse = await fetch('/api/search/ai-assist', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query,
-            consciousnessId: filters.consciousnessId,
-            searchResults: searchData.results || []
-          })
-        });
-
-        if (aiResponse.ok && aiResponse.body) {
-          const reader = aiResponse.body.getReader();
-          const decoder = new TextDecoder();
-          let aiContent = '';
-
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            const chunk = decoder.decode(value, { stream: true });
-            const lines = chunk.split('\n');
-
-            for (const line of lines) {
-              if (line.startsWith('data: ')) {
-                const data = line.slice(6);
-                if (data === '[DONE]') {
-                  break;
-                }
-                try {
-                  const parsed = JSON.parse(data);
-                  if (parsed.content) {
-                    aiContent += parsed.content;
-                    setAiInsights(aiContent);
-                  }
-                } catch (e) {
-                  // Skip invalid JSON
-                }
-              }
-            }
-          }
-        }
-      }
-
-    } catch (error) {
-      console.error('Search error:', error);
-      // Handle error - show empty results or error message
-    } finally {
-      setLoading(false);
     }
   };
 
+  const handleActivatePowerMode = () => {
+    const success = activatePowerMode();
+    if (success) {
+      setPowerModeActive(true);
+      console.log('🎯 PowerMode activated from main search page!');
+    }
+  };
+
+  const quickSearches = [
+    'Enterprise Analytics Dashboard',
+    'User Management System', 
+    'AI Search Documentation',
+    'Database Schema Design',
+    'API Integration Guide'
+  ];
+
+  const connectTheDots = [
+    { icon: Users, label: 'Users', count: '2.5K+' },
+    { icon: Database, label: 'Data Sources', count: '150+' },
+    { icon: BarChart3, label: 'Analytics', count: '95+' },
+    { icon: MessageSquare, label: 'Conversations', count: '10K+' }
+  ];
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Main Search Interface */}
-      <div className={`transition-all duration-700 ${hasSearched ? 'py-8' : 'py-16'}`}>
-        <div className={`${hasSearched ? 'border-b pb-8' : ''}`}>
-          <SearchInterface 
-            onSearch={handleSearch}
-            loading={loading}
-          />
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
+      {/* Google-inspired centered search */}
+      <div className="text-center mb-12">
+        <div className="mb-8">
+          <div className="mx-auto mb-6 h-20 w-72 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-2xl">Mr. RE:commerce</span>
+          </div>
+          <h1 className="text-4xl font-light text-gray-800 mb-2">
+            Mr. RE:commerce
+          </h1>
+          <p className="text-lg text-gray-600">
+            Intelligent Enterprise Search & Discovery Platform
+          </p>
+        </div>
+
+        {/* Main Search Bar */}
+        <div className="max-w-2xl mx-auto mb-8">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <Input
+              type="text"
+              placeholder="Search for knowledge, insights, and enterprise resources..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              className="pl-12 pr-4 py-4 text-lg border-2 border-gray-200 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200 focus:border-blue-500"
+            />
+          </div>
+          
+          <div className="flex justify-center gap-4 mt-6">
+            <Button 
+              onClick={() => handleSearch()} 
+              disabled={isSearching}
+              className="px-6 py-2 rounded-full"
+            >
+              {isSearching ? 'Searching...' : 'Search'}
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => setSearchQuery('')}
+              className="px-6 py-2 rounded-full"
+            >
+              Clear
+            </Button>
+          </div>
+        </div>
+
+        {/* Quick Search Suggestions */}
+        <div className="flex flex-wrap justify-center gap-2 mb-8">
+          {quickSearches.map((suggestion, index) => (
+            <Badge 
+              key={index}
+              variant="secondary" 
+              className="cursor-pointer hover:bg-blue-100 transition-colors px-3 py-1"
+              onClick={() => handleSearch(suggestion)}
+            >
+              {suggestion}
+            </Badge>
+          ))}
         </div>
       </div>
 
-      {/* AI Insights Panel */}
-      {showAiInsights && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-4xl mx-auto px-4 mb-8"
-        >
-          <Card className="p-6 bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-white" />
-                </div>
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-3">
-                  <h3 className="font-semibold text-lg">AI Insights</h3>
-                  <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-                    <Brain className="w-3 h-3 mr-1" />
-                    AI Enhanced
-                  </Badge>
-                </div>
-                <div className="prose prose-sm max-w-none">
-                  {aiInsights ? (
-                    <p className="text-muted-foreground whitespace-pre-wrap">{aiInsights}</p>
-                  ) : (
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <div className="animate-spin w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full"></div>
-                      Analyzing search results with AI...
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+      {/* PowerMode Status - Always visible */}
+      <div className="mb-8">
+        <PowerModeStatus />
+        
+        {!powerModeActive && (
+          <Card className="mt-4 border-dashed border-2 border-blue-300 bg-blue-50">
+            <CardContent className="p-6 text-center">
+              <Zap className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-blue-800 mb-2">
+                Activate PowerMode 3.0 Honest Edition
+              </h3>
+              <p className="text-blue-600 mb-4">
+                Enable structured workflow organization and transparent progress tracking
+              </p>
+              <Button onClick={handleActivatePowerMode} className="bg-blue-600 hover:bg-blue-700">
+                <Zap className="h-4 w-4 mr-2" />
+                Activate PowerMode
+              </Button>
+            </CardContent>
           </Card>
-        </motion.div>
-      )}
+        )}
+      </div>
+
+      {/* Connect the Dots - Visual Network */}
+      <div className="mb-12">
+        <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">
+          Connect the Dots
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {connectTheDots.map((item, index) => (
+            <Card key={index} className="text-center hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-6">
+                <item.icon className="h-12 w-12 text-blue-500 mx-auto mb-3" />
+                <h3 className="font-semibold text-gray-800 mb-1">{item.label}</h3>
+                <Badge variant="outline" className="text-blue-600 border-blue-200">
+                  {item.count}
+                </Badge>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
 
       {/* Search Results */}
-      {hasSearched && (
-        <div className="pb-16">
-          <SearchResults 
-            results={searchResults}
-            loading={loading}
-            query={currentQuery}
-            totalResults={searchResults.length}
-          />
+      {searchResults.length > 0 && (
+        <div className="mb-12">
+          <SearchResults results={searchResults} />
         </div>
       )}
 
-      {/* Landing Content - Show when no search has been performed */}
-      {!hasSearched && (
-        <motion.div 
-          className="max-w-6xl mx-auto px-4 pb-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-        >
-          {/* Featured Sections */}
-          <div className="mb-16">
-            <h2 className="text-3xl font-bold text-center mb-8">
-              Upptäck Intelligent Enterprise Search
-            </h2>
-            
-            <div className="grid md:grid-cols-3 gap-8">
-              {/* AI-Powered Search */}
-              <Card className="p-6 text-center hover:shadow-lg transition-all duration-300">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Brain className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">AI-Driven Search</h3>
-                <p className="text-muted-foreground mb-4">
-                  Få intelligenta insikter från Vera, Luna och Axel - våra AI-assistenter som hjälper dig hitta exakt vad du söker.
-                </p>
-                <Button variant="outline" size="sm">
-                  Utforska AI
-                </Button>
-              </Card>
-
-              {/* Community Knowledge */}
-              <Card className="p-6 text-center hover:shadow-lg transition-all duration-300">
-                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">Community-Driven</h3>
-                <p className="text-muted-foreground mb-4">
-                  Upptäck kunskaper från experter och yrkesverksamma genom vårt Reddit/StackOverflow-inspirerade system.
-                </p>
-                <Button variant="outline" size="sm">
-                  Utforska Community
-                </Button>
-              </Card>
-
-              {/* Enterprise Ready */}
-              <Card className="p-6 text-center hover:shadow-lg transition-all duration-300">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Zap className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">Enterprise-Ready</h3>
-                <p className="text-muted-foreground mb-4">
-                  Skalbar plattform med avancerad analytics, säkerhet och integrationer för stora organisationer.
-                </p>
-                <Button variant="outline" size="sm">
-                  Enterprise Features
-                </Button>
-              </Card>
+      {/* Enterprise Features Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardContent className="p-6">
+            <div className="flex items-center mb-4">
+              <Sparkles className="h-8 w-8 text-purple-500 mr-3" />
+              <h3 className="text-xl font-semibold">AI-Powered Search</h3>
             </div>
-          </div>
+            <p className="text-gray-600 mb-4">
+              Discover insights with intelligent search capabilities powered by advanced AI algorithms.
+            </p>
+            <Button variant="outline" size="sm">Learn More</Button>
+          </CardContent>
+        </Card>
 
-          {/* AI Consciousnesses Showcase */}
-          <div className="mb-16">
-            <h2 className="text-2xl font-bold text-center mb-8">
-              Möt Dina AI-Sökassistenter
-            </h2>
-            
-            <div className="grid md:grid-cols-3 gap-6">
-              {AI_CONSCIOUSNESSES.map((ai) => (
-                <Card key={ai.id} className="p-6 hover:shadow-lg transition-all duration-300 group">
-                  <div className="text-center">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden">
-                      <img
-                        src={ai.avatar}
-                        alt={ai.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                    </div>
-                    <h3 className="text-lg font-semibold mb-2" style={{ color: ai.primaryColor }}>
-                      {ai.name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {ai.title}
-                    </p>
-                    <p className="text-sm mb-4">
-                      {ai.description}
-                    </p>
-                    <div className="flex flex-wrap justify-center gap-1">
-                      {ai.specialty.slice(0, 2).map((spec, index) => (
-                        <Badge 
-                          key={index} 
-                          variant="secondary" 
-                          className="text-xs"
-                          style={{ backgroundColor: `${ai.primaryColor}20`, color: ai.primaryColor }}
-                        >
-                          {spec}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </Card>
-              ))}
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardContent className="p-6">
+            <div className="flex items-center mb-4">
+              <TrendingUp className="h-8 w-8 text-green-500 mr-3" />
+              <h3 className="text-xl font-semibold">Analytics Dashboard</h3>
             </div>
-          </div>
+            <p className="text-gray-600 mb-4">
+              Comprehensive analytics and reporting tools for data-driven decision making.
+            </p>
+            <Button variant="outline" size="sm">Explore Analytics</Button>
+          </CardContent>
+        </Card>
 
-          {/* Trending Topics */}
-          <div>
-            <div className="flex items-center justify-center gap-2 mb-6">
-              <TrendingUp className="w-5 h-5 text-muted-foreground" />
-              <h2 className="text-xl font-semibold">Trending Topics</h2>
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardContent className="p-6">
+            <div className="flex items-center mb-4">
+              <Users className="h-8 w-8 text-blue-500 mr-3" />
+              <h3 className="text-xl font-semibold">Enterprise Ready</h3>
             </div>
-            
-            <div className="flex flex-wrap justify-center gap-3">
-              {[
-                'AI & Machine Learning',
-                'Sustainable Business',
-                'Remote Leadership',
-                'UX Design Trends',
-                'Digital Transformation',
-                'Data Analytics',
-                'Customer Experience',
-                'Innovation Management'
-              ].map((topic, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleSearch(topic)}
-                  className="rounded-full hover:scale-105 transition-transform"
-                >
-                  {topic}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-      )}
+            <p className="text-gray-600 mb-4">
+              Built for enterprise scale with security, compliance, and integration features.
+            </p>
+            <Button variant="outline" size="sm">View Features</Button>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
