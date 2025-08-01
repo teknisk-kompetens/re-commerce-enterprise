@@ -112,6 +112,94 @@ export default function MainSearchPage() {
     'API Integration Guide'
   ];
 
+  // Alla 84 enterprise appar från gallery_fixed
+  const enterpriseApps = [
+    { name: 'Advanced Analytics Dashboard', category: 'advanced-features', icon: BarChart3, color: '#3B82F6' },
+    { name: 'Advanced Features', category: 'advanced-features', icon: Sparkles, color: '#8B5CF6' },
+    { name: 'Advanced Security Center', category: 'advanced-features', icon: Users, color: '#EF4444' },
+    { name: 'AI Analytics', category: 'ai-features', icon: Sparkles, color: '#10B981' },
+    { name: 'AI Command Center', category: 'ai-features', icon: Zap, color: '#F59E0B' },
+    { name: 'AI Insights', category: 'ai-features', icon: TrendingUp, color: '#6366F1' },
+    { name: 'AI Behavior Analytics', category: 'ai-features', icon: Users, color: '#EC4899' },
+    { name: 'AI Content Manager', category: 'ai-features', icon: MessageSquare, color: '#14B8A6' },
+    { name: 'AI Personalization Overview', category: 'ai-features', icon: Sparkles, color: '#F97316' },
+    { name: 'AI Recommendations', category: 'ai-features', icon: TrendingUp, color: '#8B5CF6' },
+    { name: 'AI Personalization Settings', category: 'ai-features', icon: Users, color: '#EF4444' },
+    { name: 'AI Studio', category: 'ai-features', icon: Zap, color: '#3B82F6' },
+    { name: 'Analytics Dashboard', category: 'analytics', icon: BarChart3, color: '#10B981' },
+    { name: 'Advanced Analytics', category: 'analytics', icon: TrendingUp, color: '#F59E0B' },
+    { name: 'Behavior Analytics', category: 'analytics', icon: Users, color: '#6366F1' },
+    { name: 'YouTube Referral Analytics', category: 'analytics', icon: BarChart3, color: '#EC4899' },
+    { name: 'Analytics Platform', category: 'analytics', icon: Database, color: '#14B8A6' },
+    { name: 'Creator Dashboard', category: 'analytics', icon: Users, color: '#F97316' },
+    { name: 'Viral Referrals', category: 'analytics', icon: TrendingUp, color: '#8B5CF6' },
+    { name: 'Authentication Signin', category: 'authentication', icon: Users, color: '#EF4444' },
+    { name: 'Intelligent BI', category: 'business-intelligence', icon: BarChart3, color: '#3B82F6' },
+    { name: 'Community Hub', category: 'community-features', icon: Users, color: '#10B981' },
+    { name: 'Community Marketplace', category: 'community-features', icon: Database, color: '#F59E0B' },
+    { name: 'Community Overview', category: 'community-features', icon: MessageSquare, color: '#6366F1' },
+    { name: 'AI Personalization Dashboard', category: 'core-features', icon: Sparkles, color: '#EC4899' },
+    { name: 'Command Center', category: 'core-features', icon: Zap, color: '#14B8A6' },
+    { name: 'Main Dashboard', category: 'core-features', icon: BarChart3, color: '#F97316' },
+    { name: 'Scene Dashboard', category: 'dashboards', icon: TrendingUp, color: '#8B5CF6' },
+    { name: 'Demo Builder', category: 'demo-tools', icon: Sparkles, color: '#EF4444' },
+    { name: 'Demo Scenarios', category: 'demo-tools', icon: Users, color: '#3B82F6' },
+    { name: 'Go Live Preparation', category: 'deployment-tools', icon: Zap, color: '#10B981' },
+    { name: 'Developer Collaboration', category: 'developer-tools', icon: MessageSquare, color: '#F59E0B' },
+    { name: 'GitHub Integration', category: 'development-platforms', icon: Database, color: '#6366F1' },
+    { name: 'StackOverflow Integration', category: 'development-platforms', icon: Users, color: '#EC4899' },
+    { name: 'Documentation Center', category: 'documentation', icon: BarChart3, color: '#14B8A6' },
+    { name: 'Gamification Achievements', category: 'engagement-tools', icon: TrendingUp, color: '#F97316' },
+    { name: 'Gamification Challenges', category: 'engagement-tools', icon: Sparkles, color: '#8B5CF6' },
+    { name: 'Gamification Leaderboards', category: 'engagement-tools', icon: Users, color: '#EF4444' },
+    { name: 'Gamification Overview', category: 'engagement-tools', icon: Zap, color: '#3B82F6' },
+    { name: 'Gamification Rewards', category: 'engagement-tools', icon: MessageSquare, color: '#10B981' },
+    { name: 'Enterprise Hub', category: 'enterprise-tools', icon: Database, color: '#F59E0B' },
+    { name: 'Enterprise Integration Hub', category: 'enterprise-tools', icon: BarChart3, color: '#6366F1' },
+    { name: 'Executive Dashboard', category: 'executive-tools', icon: TrendingUp, color: '#EC4899' },
+    { name: 'International Expansion', category: 'expansion-tools', icon: Sparkles, color: '#14B8A6' },
+    { name: 'Expansion Currencies', category: 'expansion-tools', icon: Users, color: '#F97316' },
+    { name: 'Expansion Languages', category: 'expansion-tools', icon: Zap, color: '#8B5CF6' },
+    { name: 'Market Regions', category: 'expansion-tools', icon: MessageSquare, color: '#EF4444' },
+    { name: 'Governance Center', category: 'governance-tools', icon: Database, color: '#3B82F6' },
+    { name: 'Homepage', category: 'homepage', icon: BarChart3, color: '#10B981' },
+    { name: 'API Explorer', category: 'integrations', icon: TrendingUp, color: '#F59E0B' },
+    { name: 'Developer Portal', category: 'integrations', icon: Sparkles, color: '#6366F1' },
+    { name: 'API Management', category: 'integrations', icon: Users, color: '#EC4899' },
+    { name: 'API Marketplace', category: 'integrations', icon: Zap, color: '#14B8A6' },
+    { name: 'API Overview', category: 'integrations', icon: MessageSquare, color: '#F97316' },
+    { name: 'API Webhooks', category: 'integrations', icon: Database, color: '#8B5CF6' },
+    { name: 'Integrations Main', category: 'integrations', icon: BarChart3, color: '#EF4444' },
+    { name: 'Integrations Hub', category: 'integrations', icon: TrendingUp, color: '#3B82F6' },
+    { name: 'Migration Management', category: 'migration-tools', icon: Sparkles, color: '#10B981' },
+    { name: 'ML Ops', category: 'ml-tools', icon: Users, color: '#F59E0B' },
+    { name: 'Health Monitoring', category: 'monitoring', icon: Zap, color: '#6366F1' },
+    { name: 'Monitoring Overview', category: 'monitoring', icon: MessageSquare, color: '#EC4899' },
+    { name: 'Real Time Monitoring', category: 'monitoring', icon: Database, color: '#14B8A6' },
+    { name: 'Performance Dashboard', category: 'monitoring', icon: BarChart3, color: '#F97316' },
+    { name: 'Performance Center', category: 'monitoring', icon: TrendingUp, color: '#8B5CF6' },
+    { name: 'Performance Metrics', category: 'monitoring', icon: Sparkles, color: '#EF4444' },
+    { name: 'Performance Optimization', category: 'monitoring', icon: Users, color: '#3B82F6' },
+    { name: 'System Health', category: 'monitoring', icon: Zap, color: '#10B981' },
+    { name: 'Onboarding Portal', category: 'onboarding', icon: MessageSquare, color: '#F59E0B' },
+    { name: 'Opensource Contributions', category: 'opensource', icon: Database, color: '#6366F1' },
+    { name: 'Plugin Marketplace', category: 'plugins', icon: BarChart3, color: '#EC4899' },
+    { name: 'Presentation Builder', category: 'presentation-tools', icon: TrendingUp, color: '#14B8A6' },
+    { name: 'Pricing Calculator', category: 'pricing-tools', icon: Sparkles, color: '#F97316' },
+    { name: 'Resource Allocation', category: 'resource-management', icon: Users, color: '#8B5CF6' },
+    { name: 'Sales Deck', category: 'sales-tools', icon: Zap, color: '#EF4444' },
+    { name: 'Sales Enablement', category: 'sales-tools', icon: MessageSquare, color: '#3B82F6' },
+    { name: 'Security Center', category: 'security', icon: Database, color: '#10B981' },
+    { name: 'Security Main', category: 'security', icon: BarChart3, color: '#F59E0B' },
+    { name: 'Customer Success', category: 'support-tools', icon: TrendingUp, color: '#6366F1' },
+    { name: 'Tenant Analytics', category: 'tenant-management', icon: Sparkles, color: '#EC4899' },
+    { name: 'Tenant Customization', category: 'tenant-management', icon: Users, color: '#14B8A6' },
+    { name: 'Tenant Management', category: 'tenant-management', icon: Zap, color: '#F97316' },
+    { name: 'Tenant Provisioning', category: 'tenant-management', icon: MessageSquare, color: '#8B5CF6' },
+    { name: 'Testing Center', category: 'testing-tools', icon: Database, color: '#EF4444' },
+    { name: 'Widget Factory', category: 'widgets', icon: BarChart3, color: '#3B82F6' }
+  ];
+
   const connectTheDots = [
     { icon: Users, label: 'Users', count: '2.5K+' },
     { icon: Database, label: 'Data Sources', count: '150+' },
@@ -124,14 +212,24 @@ export default function MainSearchPage() {
       {/* Google-inspired centered search */}
       <div className="text-center mb-12">
         <div className="mb-8">
-          <div className="mx-auto mb-6 h-20 w-72 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-2xl">Mr. RE:commerce</span>
+          <div className="mx-auto mb-6 h-24 w-24 bg-black rounded-full border-4 border-gray-800 flex items-center justify-center relative">
+            <div className="text-center">
+              <div className="text-white text-xs font-bold mb-1 leading-none">HIGH SIERRA</div>
+              <div className="text-white text-xs font-bold mb-1 leading-none">FOR ALL</div>
+              <div className="w-8 h-8 bg-white rounded-sm mx-auto mb-1 flex items-center justify-center">
+                <div className="w-6 h-6 bg-black rounded-sm flex items-center justify-center">
+                  <div className="text-white text-xs">👨</div>
+                </div>
+              </div>
+              <div className="text-white text-xs font-bold leading-none">MR.</div>
+              <div className="text-white text-xs font-bold leading-none">REPLACEMENT</div>
+            </div>
           </div>
           <h1 className="text-4xl font-light text-gray-800 mb-2">
-            Mr. RE:commerce
+            Mr. Replacement
           </h1>
           <p className="text-lg text-gray-600">
-            Intelligent Enterprise Search & Discovery Platform
+            High Sierra For All - Enterprise Search & Discovery Platform
           </p>
         </div>
 
@@ -205,12 +303,42 @@ export default function MainSearchPage() {
         )}
       </div>
 
-      {/* Connect the Dots - Visual Network */}
+      {/* Enterprise Apps Grid - Alla 84 appar */}
       <div className="mb-12">
         <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">
-          Connect the Dots
+          Enterprise Applications ({enterpriseApps.length} Available)
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+          {enterpriseApps.map((app, index) => (
+            <Card key={index} className="text-center hover:shadow-lg transition-all duration-200 cursor-pointer hover:scale-105 bg-white border border-gray-200">
+              <CardContent className="p-4">
+                <div 
+                  className="h-12 w-12 mx-auto mb-3 rounded-lg flex items-center justify-center"
+                  style={{ backgroundColor: app.color + '20' }}
+                >
+                  <app.icon className="h-6 w-6" style={{ color: app.color }} />
+                </div>
+                <h3 className="font-medium text-gray-800 mb-1 text-xs leading-tight">
+                  {app.name}
+                </h3>
+                <Badge 
+                  variant="outline" 
+                  className="text-xs px-2 py-1" 
+                  style={{ 
+                    borderColor: app.color + '50',
+                    color: app.color,
+                    backgroundColor: app.color + '10'
+                  }}
+                >
+                  {app.category.replace(/-/g, ' ')}
+                </Badge>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        
+        {/* Connect the Dots Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8">
           {connectTheDots.map((item, index) => (
             <Card key={index} className="text-center hover:shadow-lg transition-shadow cursor-pointer">
               <CardContent className="p-6">
