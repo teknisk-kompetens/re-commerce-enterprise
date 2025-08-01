@@ -1,0 +1,17 @@
+
+# Power Mode 3.0 Honest Edition - Dependencies
+# Endast verkliga dependencies som faktiskt används
+
+# Core dependencies
+asyncio-compat>=0.1.0  # För async support på äldre Python versioner (om behövs)
+
+# Logging och configuration
+pyyaml>=6.0  # För YAML config files (om önskat)
+
+# Development och testing (valfritt)
+pytest>=7.0.0  # För testing
+pytest-asyncio>=0.21.0  # För async testing
+
+# Inga falska AI/ML libraries som inte används!
+# Inga simulerade optimerings-bibliotek!
+# Endast det som faktiskt behövs för systemets ärliga funktionalitet.
