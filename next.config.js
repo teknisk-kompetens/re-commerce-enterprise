@@ -8,7 +8,7 @@ const nextConfig = {
   distDir: process.env.NEXT_DIST_DIR || '.next',
   output: 'standalone',
   
-  // TypeScript and ESLint configuration
+  // TypeScript and ESLint configuration (FIXED: removed duplicates)
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -45,7 +45,7 @@ const nextConfig = {
     },
   },
   
-  // Webpack optimizations
+  // Webpack optimizations (FIXED: removed sideEffects: false)
   webpack: (config, { dev, isServer }) => {
     // Bundle splitting for better caching
     if (!dev && !isServer) {
@@ -74,18 +74,10 @@ const nextConfig = {
       };
     }
     
-    // Tree shaking optimization
+    // Tree shaking optimization (FIXED: removed problematic sideEffects)
     config.optimization.usedExports = true;
-    config.optimization.sideEffects = false;
     
     return config;
-  },
-  
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
   },
   
   // Headers for performance
