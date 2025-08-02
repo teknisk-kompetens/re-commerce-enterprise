@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface SecondaryMarketLayoutProps {
@@ -22,4 +21,3 @@ export default function SecondaryMarketLayout({ children }: SecondaryMarketLayou
     </div>
   );
 }
-
