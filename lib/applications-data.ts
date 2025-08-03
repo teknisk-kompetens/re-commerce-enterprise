@@ -46,7 +46,13 @@ export const ENTERPRISE_APPLICATIONS = [
   { id: 'api-gateway', name: 'API Gateway', description: 'Enterprise API management and rate limiting', category: 'integration', icon: '🚪', status: 'active', deploymentUrl: '/api-gateway' },
   { id: 'webhook-manager', name: 'Webhook Manager', description: 'Advanced webhook management and delivery', category: 'integration', icon: '🔗', status: 'active', deploymentUrl: '/webhooks' },
   { id: 'erp-integration', name: 'ERP Integration', description: 'Seamless ERP system integration', category: 'integration', icon: '🏭', status: 'active', deploymentUrl: '/erp' },
-  { id: 'crm-integration', name: 'CRM Integration', description: 'Customer relationship management integration', category: 'integration', icon: '🤝', status: 'active', deploymentUrl: '/crm' },
+  // COMPREHENSIVE CRM SUITE
+  { id: 'crm-core', name: 'CRM Core', description: 'Complete customer relationship management system', category: 'crm', icon: '🤝', status: 'active', deploymentUrl: '/crm' },
+  { id: 'crm-contacts', name: 'Contact Management', description: 'Advanced contact and prospect management', category: 'crm', icon: '👥', status: 'active', deploymentUrl: '/crm/contacts' },
+  { id: 'crm-companies', name: 'Company Accounts', description: 'Organizational account management', category: 'crm', icon: '🏢', status: 'active', deploymentUrl: '/crm/companies' },
+  { id: 'crm-deals', name: 'Sales Pipeline', description: 'Deal tracking and sales opportunity management', category: 'crm', icon: '📈', status: 'active', deploymentUrl: '/crm/deals' },
+  { id: 'crm-activities', name: 'Activity Tracking', description: 'Customer interaction and task management', category: 'crm', icon: '📅', status: 'active', deploymentUrl: '/crm/activities' },
+  { id: 'crm-reports', name: 'CRM Analytics', description: 'Sales performance and CRM analytics', category: 'crm', icon: '📊', status: 'active', deploymentUrl: '/crm/reports' },
   { id: 'payment-gateway', name: 'Payment Gateway', description: 'Multi-provider payment processing', category: 'integration', icon: '💳', status: 'active', deploymentUrl: '/payments' },
   
   // CHUNK 8: COMMUNITY & COLLABORATION
@@ -60,7 +66,7 @@ export const ENTERPRISE_APPLICATIONS = [
   { id: 'success-stories', name: 'Success Stories', description: 'Customer success story management', category: 'marketing', icon: '⭐', status: 'active', deploymentUrl: '/success-stories' },
   { id: 'case-studies', name: 'Case Studies', description: 'Detailed customer case study platform', category: 'marketing', icon: '📄', status: 'active', deploymentUrl: '/case-studies' },
   { id: 'testimonials', name: 'Testimonials', description: 'Customer testimonial collection and display', category: 'marketing', icon: '💭', status: 'active', deploymentUrl: '/testimonials' },
-  { id: 'customer-profiles', name: 'Customer Profiles', description: 'Comprehensive customer profiling system', category: 'crm', icon: '👤', status: 'active', deploymentUrl: '/customer-profiles' },
+  { id: 'customer-profiles', name: 'Customer Profiles', description: 'Detailed customer profiles and relationship mapping', category: 'crm', icon: '👤', status: 'active', deploymentUrl: '/crm/contacts' },
   { id: 'roi-tracking', name: 'ROI Tracking', description: 'Return on investment measurement and reporting', category: 'analytics', icon: '📈', status: 'active', deploymentUrl: '/roi' },
   
   // CHUNK 10: GAMIFICATION & ENGAGEMENT

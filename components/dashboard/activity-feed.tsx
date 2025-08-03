@@ -30,7 +30,7 @@ interface ActivityItem {
     email: string
   }
   timestamp: string
-  metadata?: any
+  metadata?: Record<string, unknown>
 }
 
 const activityIcons = {

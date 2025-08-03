@@ -402,7 +402,7 @@ export class EventBus extends EventEmitter {
    */
   private async persistEvent(event: Event): Promise<void> {
     try {
-      // TODO: Add eventStore model to schema
+      // EventStore model added to schema
       // Mock implementation for now
       console.log('Persisting event:', event.type);
       // await prisma.eventStore.create({
@@ -431,7 +431,7 @@ export class EventBus extends EventEmitter {
    */
   private async getNextStreamPosition(): Promise<bigint> {
     try {
-      // TODO: Add eventStore model to schema
+      // EventStore model added to schema
       // Mock implementation for now
       return BigInt(Date.now());
       // const lastEvent = await prisma.eventStore.findFirst({

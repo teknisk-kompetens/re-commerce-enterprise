@@ -35,14 +35,6 @@ const nextConfig = {
   experimental: {
     optimizeCss: true,
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
-    },
   },
   
   // Webpack optimizations (FIXED: removed sideEffects: false)
@@ -74,8 +66,7 @@ const nextConfig = {
       };
     }
     
-    // Tree shaking optimization (FIXED: removed problematic sideEffects)
-    config.optimization.usedExports = true;
+    // Tree shaking optimization (removed usedExports to fix turbo compatibility)
     
     return config;
   },

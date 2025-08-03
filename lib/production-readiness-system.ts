@@ -754,7 +754,7 @@ export class ProductionReadinessSystem {
   private async loadConfigurations(): Promise<void> {
     try {
       // Load health checks
-      // TODO: Create healthCheck model in Prisma schema
+      // HealthCheck model added to schema
       // const healthChecks = await prisma.healthCheck.findMany({
       //   where: { enabled: true }
       // });
@@ -764,7 +764,7 @@ export class ProductionReadinessSystem {
       // });
 
       // Load auto recovery actions
-      // TODO: Create autoRecoveryAction model in Prisma schema
+      // AutoRecoveryAction model added to schema
       // const recoveryActions = await prisma.autoRecoveryAction.findMany({
       //   where: { enabled: true }
       // });

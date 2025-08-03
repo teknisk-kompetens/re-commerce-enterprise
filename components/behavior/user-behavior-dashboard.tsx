@@ -63,46 +63,205 @@ import {
   LabelList
 } from 'recharts';
 
+// Proper TypeScript interfaces replacing all 'any' types
+interface JourneySummary {
+  totalSessions: number;
+  averageSessionDuration: number;
+  topEntryPages: string[];
+  topExitPages: string[];
+  conversionRate: number;
+}
+
+interface UserPath {
+  id: string;
+  path: string[];
+  sessionCount: number;
+  conversionRate: number;
+  averageDuration: number;
+}
+
+interface DropoffPoint {
+  page: string;
+  dropoffRate: number;
+  sessionCount: number;
+  previousPage: string;
+}
+
+interface DeviceAnalysis {
+  device: 'desktop' | 'mobile' | 'tablet';
+  sessionCount: number;
+  conversionRate: number;
+  averageDuration: number;
+}
+
+interface TimeSeriesDataPoint {
+  timestamp: string;
+  sessions: number;
+  conversions: number;
+  bounceRate: number;
+}
+
+interface HeatmapSummary {
+  totalInteractions: number;
+  averageTimeOnPage: number;
+  topInteractedElements: string[];
+  scrollDepth: number;
+}
+
+interface HeatmapDataPoint {
+  x: number;
+  y: number;
+  intensity: number;
+  elementType: string;
+}
+
+interface TopPage {
+  url: string;
+  views: number;
+  averageTimeOnPage: number;
+  bounceRate: number;
+}
+
+interface InteractionBreakdown {
+  elementType: string;
+  interactions: number;
+  conversionRate: number;
+}
+
+interface DeviceBreakdown {
+  device: string;
+  percentage: number;
+  sessions: number;
+}
+
+interface RecordingSummary {
+  totalRecordings: number;
+  averageSessionDuration: number;
+  uniqueUsers: number;
+  topBouncePages: string[];
+}
+
+interface SessionRecording {
+  id: string;
+  userId: string;
+  duration: number;
+  pages: string[];
+  events: number;
+  timestamp: string;
+  device: string;
+}
+
+interface BounceAnalysis {
+  bounceRate: number;
+  topBouncePages: string[];
+  averageTimeToBounceBounce: number;
+}
+
+interface ABTestSummary {
+  activeTests: number;
+  completedTests: number;
+  totalVariations: number;
+  significantResults: number;
+}
+
+interface ABTest {
+  id: string;
+  name: string;
+  status: 'active' | 'completed' | 'paused';
+  variations: Array<{
+    id: string;
+    name: string;
+    traffic: number;
+    conversions: number;
+    conversionRate: number;
+  }>;
+  startDate: string;
+  endDate?: string;
+  confidence: number;
+}
+
+interface SegmentSummary {
+  totalSegments: number;
+  activeUsers: number;
+  topPerformingSegment: string;
+}
+
+interface BehavioralSegment {
+  id: string;
+  name: string;
+  userCount: number;
+  conversionRate: number;
+  avgSessionDuration: number;
+  criteria: string[];
+}
+
+interface UserFlowTransition {
+  from: string;
+  to: string;
+  sessionCount: number;
+  conversionRate: number;
+}
+
+interface InteractionSummary {
+  totalInteractions: number;
+  averageInteractionsPerSession: number;
+  topInteractionType: string;
+}
+
+interface TopElement {
+  selector: string;
+  interactions: number;
+  conversionRate: number;
+  elementType: string;
+}
+
+interface InteractionHeatmapPoint {
+  elementId: string;
+  interactions: number;
+  x: number;
+  y: number;
+}
+
 interface BehaviorData {
   userJourneys: {
-    summary: any;
-    topPaths: any[];
-    dropoffPoints: any[];
-    deviceAnalysis: any[];
-    timeSeriesData: any[];
+    summary: JourneySummary;
+    topPaths: UserPath[];
+    dropoffPoints: DropoffPoint[];
+    deviceAnalysis: DeviceAnalysis[];
+    timeSeriesData: TimeSeriesDataPoint[];
   };
   heatmapData: {
-    summary: any;
-    heatmapData: any[];
-    topPages: any[];
-    interactionBreakdown: any[];
-    deviceBreakdown: any[];
+    summary: HeatmapSummary;
+    heatmapData: HeatmapDataPoint[];
+    topPages: TopPage[];
+    interactionBreakdown: InteractionBreakdown[];
+    deviceBreakdown: DeviceBreakdown[];
   };
   sessionRecordings: {
-    summary: any;
-    recordings: any[];
-    deviceBreakdown: any[];
-    bounceAnalysis: any;
+    summary: RecordingSummary;
+    recordings: SessionRecording[];
+    deviceBreakdown: DeviceBreakdown[];
+    bounceAnalysis: BounceAnalysis;
   };
   abTests: {
-    summary: any;
-    activeTests: any[];
-    completedTests: any[];
+    summary: ABTestSummary;
+    activeTests: ABTest[];
+    completedTests: ABTest[];
   };
   behavioralSegments: {
-    summary: any;
-    segments: any[];
+    summary: SegmentSummary;
+    segments: BehavioralSegment[];
   };
   userFlow: {
-    transitions: any[];
+    transitions: UserFlowTransition[];
     totalSessions: number;
     totalSteps: number;
     uniqueSteps: number;
   };
   interactionAnalysis: {
-    summary: any;
-    topElements: any[];
-    interactionHeatmap: any[];
+    summary: InteractionSummary;
+    topElements: TopElement[];
+    interactionHeatmap: InteractionHeatmapPoint[];
   };
 }
 

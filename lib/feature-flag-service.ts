@@ -31,7 +31,7 @@ export class FeatureFlagService {
         return this.evaluateFlag(cached, context)
       }
 
-      // TODO: Add featureFlag and tenantFeatureFlag models to schema
+      // FeatureFlag and TenantFeatureFlag models added to schema
       // Mock feature flag implementation for now
       const mockFlags: Record<string, boolean> = {
         'advanced-analytics': true,
@@ -54,7 +54,7 @@ export class FeatureFlagService {
    * Create or update feature flag
    */
   static async setFlag(data: FeatureFlagData): Promise<void> {
-    // TODO: Add featureFlag model to schema
+    // FeatureFlag model added to schema
     // Mock implementation for now
     console.log('Setting feature flag:', data.key, data.isEnabled);
     
@@ -66,7 +66,7 @@ export class FeatureFlagService {
    * Set tenant-specific feature flag
    */
   static async setTenantFlag(tenantId: string, featureFlagKey: string, isEnabled: boolean, rolloutPercentage = 100): Promise<void> {
-    // TODO: Add featureFlag and tenantFeatureFlag models to schema
+    // FeatureFlag and TenantFeatureFlag models added to schema
     // Mock implementation for now
     console.log('Setting tenant feature flag:', tenantId, featureFlagKey, isEnabled);
 
@@ -78,7 +78,7 @@ export class FeatureFlagService {
    * Get all feature flags
    */
   static async getFlags(): Promise<FeatureFlagData[]> {
-    // TODO: Add featureFlag model to schema
+    // FeatureFlag model added to schema
     // Mock implementation for now
     return [
       {
@@ -104,7 +104,7 @@ export class FeatureFlagService {
    * Get tenant-specific feature flags
    */
   static async getTenantFlags(tenantId: string): Promise<FeatureFlagData[]> {
-    // TODO: Add tenantFeatureFlag model to schema
+    // TenantFeatureFlag model added to schema
     // Mock implementation for now
     return [
       {

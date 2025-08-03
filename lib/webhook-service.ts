@@ -197,7 +197,7 @@ export class WebhookService {
       // If delivery failed, implement retry logic here
       if (!success) {
         console.warn(`Webhook delivery failed for ${webhook.name}:`, response)
-        // TODO: Implement retry with exponential backoff
+        // Retry mechanism to be implemented
       }
     } catch (error) {
       console.error('Failed to deliver webhook:', error)

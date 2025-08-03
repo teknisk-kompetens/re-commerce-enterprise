@@ -242,7 +242,7 @@ export function PricingCalculatorTool() {
                         <Label>Company Size</Label>
                         <Select
                           value={config.companySize}
-                          onValueChange={(value: any) => setConfig(prev => ({ ...prev, companySize: value }))}
+                          onValueChange={(value: string) => setConfig(prev => ({ ...prev, companySize: value }))}
                         >
                           <SelectTrigger>
                             <SelectValue />

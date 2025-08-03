@@ -82,7 +82,7 @@ interface OnboardingStep {
   id: string;
   title: string;
   description: string;
-  icon: any;
+  icon: React.ComponentType<any>;
   completed: boolean;
   required: boolean;
   estimatedTime: number;
@@ -159,7 +159,7 @@ export function EnterpriseOnboardingSystem() {
     billingEmail: ''
   });
   
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -367,7 +367,7 @@ export function EnterpriseOnboardingSystem() {
     setUsers(users.filter(user => user.id !== userId));
   };
 
-  const updateUser = (userId: string, updates: any) => {
+  const updateUser = (userId: string, updates: Partial<User>) => {
     setUsers(users.map(user => 
       user.id === userId ? { ...user, ...updates } : user
     ));

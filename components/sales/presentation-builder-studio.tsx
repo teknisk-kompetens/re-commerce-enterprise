@@ -54,10 +54,10 @@ interface SlideTemplate {
 interface SlideElement {
   id: string;
   type: 'text' | 'image' | 'chart' | 'shape' | 'video';
-  content: any;
+  content: Record<string, unknown>;
   position: { x: number; y: number };
   size: { width: number; height: number };
-  style: Record<string, any>;
+  style: Record<string, string | number>;
 }
 
 interface Presentation {

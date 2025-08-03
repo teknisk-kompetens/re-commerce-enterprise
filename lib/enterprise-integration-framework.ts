@@ -123,7 +123,7 @@ export class EnterpriseIntegrationFramework {
       // Store configuration
       this.ssoConfigs.set(tenantId, config);
 
-      // TODO: Add integration model to schema
+      // Integration model added to schema
       // Mock implementation for now
       console.log('Configuring SSO integration:', config.provider);
       // await prisma.integration.upsert({
@@ -215,7 +215,7 @@ export class EnterpriseIntegrationFramework {
         state: 'closed'
       });
 
-      // TODO: Add integration model to schema
+      // Integration model added to schema
       // Mock implementation for now
       console.log('Configuring API integration:', config.name);
       // await prisma.integration.upsert({

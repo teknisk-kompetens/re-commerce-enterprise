@@ -53,35 +53,155 @@ import {
   LabelList
 } from 'recharts';
 
+// Proper TypeScript interfaces for analytics data
+interface EngagementOverview {
+  totalUsers: number;
+  activeUsers: number;
+  sessionsToday: number;
+  averageSessionDuration: number;
+  bounceRate: number;
+  pageViews: number;
+}
+
+interface DeviceBreakdown {
+  device: 'desktop' | 'mobile' | 'tablet';
+  users: number;
+  percentage: number;
+  averageSessionDuration: number;
+}
+
+interface TimeSeriesDataPoint {
+  timestamp: string;
+  value: number;
+  metric: string;
+}
+
+interface FeatureUsage {
+  featureId: string;
+  featureName: string;
+  usageCount: number;
+  uniqueUsers: number;
+  conversionRate: number;
+  category: string;
+}
+
+interface CategoryBreakdown {
+  category: string;
+  usageCount: number;
+  percentage: number;
+  averageTimeSpent: number;
+}
+
+interface ConversionFunnel {
+  id: string;
+  name: string;
+  steps: Array<{
+    stepName: string;
+    users: number;
+    conversionRate: number;
+    dropoffRate: number;
+  }>;
+  overallConversionRate: number;
+  totalUsers: number;
+}
+
+interface FunnelSummary {
+  totalFunnels: number;
+  averageConversionRate: number;
+  biggestDropoffStep: string;
+  mostImprovedFunnel: string;
+}
+
+interface RevenueOverview {
+  totalRevenue: number;
+  monthlyRecurringRevenue: number;
+  averageRevenuePerUser: number;
+  revenueGrowthRate: number;
+  totalCustomers: number;
+  churnRate: number;
+}
+
+interface RevenueByType {
+  type: 'subscription' | 'one-time' | 'addon';
+  amount: number;
+  percentage: number;
+  growth: number;
+}
+
+interface RevenueByPlan {
+  planName: string;
+  amount: number;
+  subscribers: number;
+  averageRevenuePerUser: number;
+}
+
+interface JourneySummary {
+  totalJourneys: number;
+  averageSteps: number;
+  topConversionPath: string;
+  averageTimeToConversion: number;
+}
+
+interface UserPath {
+  id: string;
+  path: string[];
+  userCount: number;
+  conversionRate: number;
+  averageDuration: number;
+}
+
+interface DeviceAnalysis {
+  device: 'desktop' | 'mobile' | 'tablet';
+  userCount: number;
+  conversionRate: number;
+  averageSessionDuration: number;
+}
+
+interface BehavioralSegment {
+  id: string;
+  name: string;
+  userCount: number;
+  conversionRate: number;
+  averageValue: number;
+  characteristics: string[];
+}
+
+interface SegmentSummary {
+  totalSegments: number;
+  mostValuableSegment: string;
+  fastestGrowingSegment: string;
+  segmentationAccuracy: number;
+}
+
 interface AnalyticsData {
   userEngagement: {
-    overview: any;
-    deviceBreakdown: any[];
-    timeSeriesData: any[];
+    overview: EngagementOverview;
+    deviceBreakdown: DeviceBreakdown[];
+    timeSeriesData: TimeSeriesDataPoint[];
   };
   featureUsage: {
-    topFeatures: any[];
-    categoryBreakdown: any[];
-    timeSeriesData: any[];
+    topFeatures: FeatureUsage[];
+    categoryBreakdown: CategoryBreakdown[];
+    timeSeriesData: TimeSeriesDataPoint[];
   };
   conversionFunnels: {
-    funnels: any[];
-    summary: any;
+    funnels: ConversionFunnel[];
+    summary: FunnelSummary;
   };
   revenueAnalytics: {
-    overview: any;
-    revenueByType: any[];
-    revenueByPlan: any[];
-    timeSeriesData: any[];
+    overview: RevenueOverview;
+    revenueByType: RevenueByType[];
+    revenueByPlan: RevenueByPlan[];
+    timeSeriesData: TimeSeriesDataPoint[];
   };
   userJourneys: {
-    summary: any;
-    topPaths: any[];
-    deviceAnalysis: any[];
+    summary: JourneySummary;
+    topPaths: UserPath[];
+    deviceAnalysis: DeviceAnalysis[];
   };
   behavioralSegments: {
-    segments: any[];
-    summary: any;
+    segments: BehavioralSegment[];
+    summary: SegmentSummary;
   };
 }
 

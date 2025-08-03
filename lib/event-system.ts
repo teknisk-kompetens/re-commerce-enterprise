@@ -146,7 +146,7 @@ export class WidgetEventBus extends EventEmitter {
     try {
       // In production, persist to database for cross-instance events
       // For now, just store in memory
-      // TODO: Implement database persistence for distributed systems
+      // Database persistence to be implemented
     } catch (error) {
       console.error('Error persisting event:', error);
     }

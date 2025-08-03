@@ -158,6 +158,22 @@ model User {
   languagePreferences        UserLanguagePreference[]
   internationalPreference    UserInternationalPreference?
 
+  // COMPREHENSIVE ENTERPRISE CRM RELATIONS
+  ownedCompanies             CRMCompany[] @relation("CompanyOwner")
+  ownedContacts              CRMContact[] @relation("ContactOwner")
+  ownedDeals                 CRMDeal[] @relation("DealOwner")
+  ownedActivities            CRMActivity[] @relation("ActivityOwner")
+  authoredNotes              CRMNote[] @relation("NoteAuthor")
+  uploadedDocuments          CRMDocument[] @relation("DocumentUploader")
+  assignedCRMTasks           CRMTask[] @relation("TaskAssignee")
+  createdTasks               CRMTask[] @relation("TaskCreator")
+  sentEmails                 CRMEmail[] @relation("EmailSender")
+  madeCalls                  CRMCall[] @relation("CallCaller")
+  organizedMeetings          CRMMeeting[] @relation("MeetingOrganizer")
+  meetingAttendances         CRMMeetingAttendee[] @relation("MeetingAttendeeUser")
+  createdReports             CRMReport[] @relation("ReportCreator")
+  createdDashboards          CRMDashboard[] @relation("DashboardCreator")
+
   @@map("users")
 }
 
@@ -410,6 +426,30 @@ model Tenant {
   marketAnalytics            MarketAnalytics[]
   supportTickets             SupportTicket[]
   expansionRoadmaps          ExpansionRoadmap[]
+
+  // CRM SYSTEM RELATIONS
+  crmCompanies              CRMCompany[]
+  crmContacts               CRMContact[]
+  crmDeals                  CRMDeal[]
+  crmProducts               CRMProduct[]
+  crmActivities             CRMActivity[]
+  crmNotes                  CRMNote[]
+  crmDocuments              CRMDocument[]
+  crmTasks                  CRMTask[]
+  crmEmails                 CRMEmail[]
+  crmCalls                  CRMCall[]
+  crmMeetings               CRMMeeting[]
+  crmPipelines              CRMPipeline[]
+  crmReports                CRMReport[]
+  crmDashboards             CRMDashboard[]
+
+  // New model relations (resolving TODO items)
+  eventStores               EventStore[]
+  processedData             ProcessedData[]
+  integrations              Integration[]
+  tenantFeatureFlags        TenantFeatureFlag[]
+  healthChecks              HealthCheck[]
+  autoRecoveryActions       AutoRecoveryAction[]
 
   @@map("tenants")
 }
@@ -3120,6 +3160,668 @@ model CRMDataMapping {
   @@unique([integrationId, sourceField, targetField])
   @@map("crm_data_mappings")
 }
+
+// ==================================================================
+// COMPREHENSIVE ENTERPRISE CRM CORE MODELS
+// ==================================================================
+
+model CRMCompany {
+  id                String   @id @default(cuid())
+  name              String
+  industry          String?
+  size              String?  // "startup", "small", "medium", "large", "enterprise"
+  revenue           Decimal?
+  employees         Int?
+  website           String?
+  description       String?
+  logo              String?
+  status            String   @default("active") // active, inactive, prospect
+  type              String   @default("prospect") // prospect, customer, partner, competitor
+  source            String?  // referral, website, event, cold_call, etc.
+  rating            String?  // hot, warm, cold
+  priority          String   @default("medium") // low, medium, high, critical
+  tags              Json     @default("[]")
+  customFields      Json     @default("{}")
+  
+  // Address Information
+  street            String?
+  city              String?
+  state             String?
+  postalCode        String?
+  country           String?
+  timezone          String?
+  
+  // Social Links
+  linkedinUrl       String?
+  twitterHandle     String?
+  facebookUrl       String?
+  
+  // Tracking
+  lastContactDate   DateTime?
+  nextFollowUpDate  DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  
+  // CRM Owner
+  ownerId           String?
+  owner             User?    @relation("CompanyOwner", fields: [ownerId], references: [id])
+  
+  // Relations
+  contacts          CRMContact[]
+  deals             CRMDeal[]
+  activities        CRMActivity[]
+  notes             CRMNote[]
+  documents         CRMDocument[]
+  tasks             CRMTask[]
+  emails            CRMEmail[]
+  calls             CRMCall[]
+  meetings          CRMMeeting[]
+
+  @@map("crm_companies")
+  @@index([tenantId, status])
+  @@index([tenantId, type])
+  @@index([ownerId])
+}
+
+model CRMContact {
+  id                String   @id @default(cuid())
+  firstName         String
+  lastName          String
+  email             String?
+  phone             String?
+  mobile            String?
+  jobTitle          String?
+  department        String?
+  status            String   @default("active") // active, inactive, do_not_contact
+  leadScore         Int      @default(0)
+  rating            String?  // hot, warm, cold
+  source            String?
+  tags              Json     @default("[]")
+  customFields      Json     @default("{}")
+  
+  // Contact Information
+  street            String?
+  city              String?
+  state             String?
+  postalCode        String?
+  country           String?
+  timezone          String?
+  
+  // Social Information
+  linkedinUrl       String?
+  twitterHandle     String?
+  facebookUrl       String?
+  skypeId           String?
+  
+  // Preferences
+  emailOptIn        Boolean  @default(true)
+  smsOptIn          Boolean  @default(false)
+  preferredContact  String   @default("email") // email, phone, sms
+  
+  // Tracking
+  lastContactDate   DateTime?
+  nextFollowUpDate  DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  
+  // Company Relationship
+  companyId         String?
+  company           CRMCompany? @relation(fields: [companyId], references: [id])
+  
+  // CRM Owner
+  ownerId           String?
+  owner             User?    @relation("ContactOwner", fields: [ownerId], references: [id])
+  
+  // Relations
+  deals             CRMDeal[]
+  activities        CRMActivity[]
+  notes             CRMNote[]
+  documents         CRMDocument[]
+  tasks             CRMTask[]
+  emails            CRMEmail[]
+  calls             CRMCall[]
+  meetings          CRMMeeting[]
+  meetingAttendees  CRMMeetingAttendee[]
+
+  @@map("crm_contacts")
+  @@index([tenantId, status])
+  @@index([email])
+  @@index([companyId])
+  @@index([ownerId])
+}
+
+model CRMDeal {
+  id                String   @id @default(cuid())
+  name              String
+  value             Decimal
+  currency          String   @default("USD")
+  stage             String   @default("prospecting") // prospecting, qualification, proposal, negotiation, closed_won, closed_lost
+  probability       Int      @default(0) // 0-100
+  priority          String   @default("medium") // low, medium, high, critical
+  source            String?
+  type              String?  // new_business, existing_business, renewal
+  description       String?
+  tags              Json     @default("[]")
+  customFields      Json     @default("{}")
+  
+  // Important Dates
+  expectedCloseDate DateTime?
+  actualCloseDate   DateTime?
+  lastActivityDate  DateTime?
+  nextActivityDate  DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  
+  // Relationships
+  companyId         String?
+  company           CRMCompany? @relation(fields: [companyId], references: [id])
+  
+  primaryContactId  String?
+  primaryContact    CRMContact? @relation(fields: [primaryContactId], references: [id])
+  
+  // CRM Owner
+  ownerId           String?
+  owner             User?    @relation("DealOwner", fields: [ownerId], references: [id])
+  
+  // Relations
+  activities        CRMActivity[]
+  notes             CRMNote[]
+  documents         CRMDocument[]
+  tasks             CRMTask[]
+  emails            CRMEmail[]
+  calls             CRMCall[]
+  meetings          CRMMeeting[]
+  dealProducts      CRMDealProduct[]
+
+  @@map("crm_deals")
+  @@index([tenantId, stage])
+  @@index([tenantId, expectedCloseDate])
+  @@index([companyId])
+  @@index([primaryContactId])
+  @@index([ownerId])
+}
+
+model CRMProduct {
+  id                String   @id @default(cuid())
+  name              String
+  sku               String?
+  description       String?
+  category          String?
+  unitPrice         Decimal
+  currency          String   @default("USD")
+  active            Boolean  @default(true)
+  customFields      Json     @default("{}")
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  
+  // Relations
+  dealProducts      CRMDealProduct[]
+
+  @@map("crm_products")
+  @@index([tenantId, active])
+  @@index([sku])
+}
+
+model CRMDealProduct {
+  id                String   @id @default(cuid())
+  quantity          Int      @default(1)
+  unitPrice         Decimal
+  discount          Decimal  @default(0)
+  totalPrice        Decimal
+  
+  dealId            String
+  deal              CRMDeal  @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  
+  productId         String
+  product           CRMProduct @relation(fields: [productId], references: [id])
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("crm_deal_products")
+  @@index([dealId])
+  @@index([productId])
+}
+
+model CRMActivity {
+  id                String   @id @default(cuid())
+  type              String   // call, email, meeting, task, note, demo, presentation
+  subject           String
+  description       String?
+  status            String   @default("completed") // scheduled, in_progress, completed, cancelled
+  priority          String   @default("medium") // low, medium, high, critical
+  duration          Int?     // in minutes
+  location          String?
+  outcome           String?  // positive, negative, neutral
+  customFields      Json     @default("{}")
+  
+  // Timing
+  scheduledAt       DateTime?
+  completedAt       DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  
+  // Relationships
+  companyId         String?
+  company           CRMCompany? @relation(fields: [companyId], references: [id])
+  
+  contactId         String?
+  contact           CRMContact? @relation(fields: [contactId], references: [id])
+  
+  dealId            String?
+  deal              CRMDeal? @relation(fields: [dealId], references: [id])
+  
+  // CRM Owner
+  ownerId           String?
+  owner             User?    @relation("ActivityOwner", fields: [ownerId], references: [id])
+
+  @@map("crm_activities")
+  @@index([tenantId, type])
+  @@index([tenantId, scheduledAt])
+  @@index([companyId])
+  @@index([contactId])
+  @@index([dealId])
+  @@index([ownerId])
+}
+
+model CRMNote {
+  id                String   @id @default(cuid())
+  title             String?
+  content           String
+  isPrivate         Boolean  @default(false)
+  tags              Json     @default("[]")
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  
+  // Relationships
+  companyId         String?
+  company           CRMCompany? @relation(fields: [companyId], references: [id])
+  
+  contactId         String?
+  contact           CRMContact? @relation(fields: [contactId], references: [id])
+  
+  dealId            String?
+  deal              CRMDeal? @relation(fields: [dealId], references: [id])
+  
+  // Author
+  authorId          String
+  author            User     @relation("NoteAuthor", fields: [authorId], references: [id])
+
+  @@map("crm_notes")
+  @@index([tenantId, createdAt])
+  @@index([companyId])
+  @@index([contactId])
+  @@index([dealId])
+  @@index([authorId])
+}
+
+model CRMDocument {
+  id                String   @id @default(cuid())
+  name              String
+  fileName          String
+  fileSize          Int?
+  fileType          String?
+  filePath          String
+  description       String?
+  tags              Json     @default("[]")
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  
+  // Relationships
+  companyId         String?
+  company           CRMCompany? @relation(fields: [companyId], references: [id])
+  
+  contactId         String?
+  contact           CRMContact? @relation(fields: [contactId], references: [id])
+  
+  dealId            String?
+  deal              CRMDeal? @relation(fields: [dealId], references: [id])
+  
+  // Uploader
+  uploaderId        String
+  uploader          User     @relation("DocumentUploader", fields: [uploaderId], references: [id])
+
+  @@map("crm_documents")
+  @@index([tenantId, createdAt])
+  @@index([companyId])
+  @@index([contactId])
+  @@index([dealId])
+  @@index([uploaderId])
+}
+
+model CRMTask {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  status            String   @default("pending") // pending, in_progress, completed, cancelled
+  priority          String   @default("medium") // low, medium, high, critical
+  dueDate           DateTime?
+  completedAt       DateTime?
+  tags              Json     @default("[]")
+  customFields      Json     @default("{}")
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  
+  // Relationships
+  companyId         String?
+  company           CRMCompany? @relation(fields: [companyId], references: [id])
+  
+  contactId         String?
+  contact           CRMContact? @relation(fields: [contactId], references: [id])
+  
+  dealId            String?
+  deal              CRMDeal? @relation(fields: [dealId], references: [id])
+  
+  // Assignment
+  assignedToId      String?
+  assignedTo        User?    @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  
+  createdById       String
+  createdBy         User     @relation("TaskCreator", fields: [createdById], references: [id])
+
+  @@map("crm_tasks")
+  @@index([tenantId, status])
+  @@index([tenantId, dueDate])
+  @@index([companyId])
+  @@index([contactId])
+  @@index([dealId])
+  @@index([assignedToId])
+  @@index([createdById])
+}
+
+model CRMEmail {
+  id                String   @id @default(cuid())
+  subject           String
+  body              String
+  direction         String   // inbound, outbound
+  status            String   @default("sent") // draft, scheduled, sent, delivered, opened, clicked, bounced
+  threadId          String?
+  messageId         String?
+  fromEmail         String
+  toEmails          Json     @default("[]")
+  ccEmails          Json     @default("[]")
+  bccEmails         Json     @default("[]")
+  attachments       Json     @default("[]")
+  emailProvider     String?  // gmail, outlook, sendgrid, etc.
+  
+  sentAt            DateTime?
+  openedAt          DateTime?
+  clickedAt         DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  
+  // Relationships
+  companyId         String?
+  company           CRMCompany? @relation(fields: [companyId], references: [id])
+  
+  contactId         String?
+  contact           CRMContact? @relation(fields: [contactId], references: [id])
+  
+  dealId            String?
+  deal              CRMDeal? @relation(fields: [dealId], references: [id])
+  
+  // Sender/Creator
+  senderId          String?
+  sender            User?    @relation("EmailSender", fields: [senderId], references: [id])
+
+  @@map("crm_emails")
+  @@index([tenantId, direction])
+  @@index([tenantId, status])
+  @@index([companyId])
+  @@index([contactId])
+  @@index([dealId])
+  @@index([senderId])
+  @@index([messageId])
+}
+
+model CRMCall {
+  id                String   @id @default(cuid())
+  subject           String
+  description       String?
+  direction         String   // inbound, outbound
+  status            String   @default("completed") // scheduled, in_progress, completed, missed, cancelled
+  outcome           String?  // positive, negative, neutral, voicemail
+  duration          Int?     // in seconds
+  recordingUrl      String?
+  phoneNumber       String?
+  
+  scheduledAt       DateTime?
+  startedAt         DateTime?
+  endedAt           DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  
+  // Relationships
+  companyId         String?
+  company           CRMCompany? @relation(fields: [companyId], references: [id])
+  
+  contactId         String?
+  contact           CRMContact? @relation(fields: [contactId], references: [id])
+  
+  dealId            String?
+  deal              CRMDeal? @relation(fields: [dealId], references: [id])
+  
+  // Caller
+  callerId          String?
+  caller            User?    @relation("CallCaller", fields: [callerId], references: [id])
+
+  @@map("crm_calls")
+  @@index([tenantId, direction])
+  @@index([tenantId, status])
+  @@index([companyId])
+  @@index([contactId])
+  @@index([dealId])
+  @@index([callerId])
+}
+
+model CRMMeeting {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  location          String?
+  meetingUrl        String?
+  status            String   @default("scheduled") // scheduled, in_progress, completed, cancelled
+  type              String?  // demo, discovery, proposal, negotiation, closing
+  outcome           String?  // positive, negative, neutral
+  agenda            String?
+  notes             String?
+  
+  startTime         DateTime
+  endTime           DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  
+  // Relationships
+  companyId         String?
+  company           CRMCompany? @relation(fields: [companyId], references: [id])
+  
+  contactId         String?
+  contact           CRMContact? @relation(fields: [contactId], references: [id])
+  
+  dealId            String?
+  deal              CRMDeal? @relation(fields: [dealId], references: [id])
+  
+  // Organizer
+  organizerId       String
+  organizer         User     @relation("MeetingOrganizer", fields: [organizerId], references: [id])
+  
+  // Attendees
+  attendees         CRMMeetingAttendee[]
+
+  @@map("crm_meetings")
+  @@index([tenantId, status])
+  @@index([tenantId, startTime])
+  @@index([companyId])
+  @@index([contactId])
+  @@index([dealId])
+  @@index([organizerId])
+}
+
+model CRMMeetingAttendee {
+  id                String   @id @default(cuid())
+  email             String
+  name              String?
+  status            String   @default("invited") // invited, accepted, declined, tentative, no_response
+  isOrganizer       Boolean  @default(false)
+  
+  meetingId         String
+  meeting           CRMMeeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  
+  contactId         String?
+  contact           CRMContact? @relation(fields: [contactId], references: [id])
+  
+  userId            String?
+  user              User?    @relation("MeetingAttendeeUser", fields: [userId], references: [id])
+
+  @@map("crm_meeting_attendees")
+  @@unique([meetingId, email])
+  @@index([meetingId])
+  @@index([contactId])
+  @@index([userId])
+}
+
+model CRMPipeline {
+  id                String   @id @default(cuid())
+  name              String
+  description       String?
+  isDefault         Boolean  @default(false)
+  active            Boolean  @default(true)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  
+  // Stages
+  stages            CRMPipelineStage[]
+
+  @@map("crm_pipelines")
+  @@index([tenantId, active])
+}
+
+model CRMPipelineStage {
+  id                String   @id @default(cuid())
+  name              String
+  description       String?
+  probability       Int      @default(0) // 0-100
+  order             Int
+  color             String?
+  active            Boolean  @default(true)
+  
+  pipelineId        String
+  pipeline          CRMPipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("crm_pipeline_stages")
+  @@unique([pipelineId, order])
+  @@index([pipelineId])
+}
+
+// CRM Analytics and Reporting Models
+model CRMReport {
+  id                String   @id @default(cuid())
+  name              String
+  description       String?
+  type              String   // sales, activities, performance, forecast
+  config            Json     @default("{}")
+  filters           Json     @default("{}")
+  schedule          Json?    // for automated reports
+  isPublic          Boolean  @default(false)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  
+  // Creator
+  createdById       String
+  createdBy         User     @relation("ReportCreator", fields: [createdById], references: [id])
+
+  @@map("crm_reports")
+  @@index([tenantId, type])
+  @@index([createdById])
+}
+
+model CRMDashboard {
+  id                String   @id @default(cuid())
+  name              String
+  description       String?
+  layout            Json     @default("{}")
+  widgets           Json     @default("[]")
+  isDefault         Boolean  @default(false)
+  isPublic          Boolean  @default(false)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  
+  // Creator
+  createdById       String
+  createdBy         User     @relation("DashboardCreator", fields: [createdById], references: [id])
+
+  @@map("crm_dashboards")
+  @@index([tenantId, isDefault])
+  @@index([createdById])
+}
+
+// Update User model to include new CRM relations
 
 // HR System Integration
 model HRIntegration {
@@ -12350,5 +13052,129 @@ model ContentPerformanceAnalytics {
   @@index([contentType, date])
   @@index([viralityScore, engagementRate])
   @@map("content_performance_analytics")
+}
+
+// Event Store Model for Event Bus System
+model EventStore {
+  id            String   @id @default(cuid())
+  eventType     String
+  eventData     Json
+  entityId      String?
+  entityType    String?
+  userId        String?
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  timestamp     DateTime @default(now())
+  processed     Boolean  @default(false)
+  retryCount    Int      @default(0)
+  
+  @@index([eventType, timestamp])
+  @@index([entityId, entityType])
+  @@index([processed, timestamp])
+  @@map("event_store")
+}
+
+// Processed Data Model for Analytics Engine
+model ProcessedData {
+  id            String   @id @default(cuid())
+  dataType      String
+  dataSource    String
+  processedData Json
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  processingDate DateTime
+  metadata      Json     @default("{}")
+  
+  @@index([dataType, processingDate])
+  @@index([tenantId, dataType])
+  @@map("processed_data")
+}
+
+// Integration Model for Enterprise Integration Framework
+model Integration {
+  id            String   @id @default(cuid())
+  name          String
+  type          String
+  status        String   @default("active")
+  config        Json
+  credentials   Json?
+  lastSync      DateTime?
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([type, status])
+  @@index([tenantId, status])
+  @@map("integrations")
+}
+
+// Feature Flag Model for Feature Flag Service
+model FeatureFlag {
+  id            String               @id @default(cuid())
+  key           String               @unique
+  name          String
+  description   String?
+  type          String               @default("boolean")
+  defaultValue  Json
+  enabled       Boolean              @default(true)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  
+  // Relations
+  tenantFeatureFlags TenantFeatureFlag[]
+  
+  @@map("feature_flags")
+}
+
+// Tenant-specific Feature Flag overrides
+model TenantFeatureFlag {
+  id            String      @id @default(cuid())
+  tenantId      String
+  tenant        Tenant      @relation(fields: [tenantId], references: [id])
+  featureFlagId String
+  featureFlag   FeatureFlag @relation(fields: [featureFlagId], references: [id])
+  value         Json
+  enabled       Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  @@unique([tenantId, featureFlagId])
+  @@map("tenant_feature_flags")
+}
+
+// Health Check Model for Production Readiness System
+model HealthCheck {
+  id            String   @id @default(cuid())
+  serviceName   String
+  checkType     String
+  status        String   @default("unknown")
+  responseTime  Int?
+  details       Json     @default("{}")
+  timestamp     DateTime @default(now())
+  tenantId      String?
+  tenant        Tenant?  @relation(fields: [tenantId], references: [id])
+  
+  @@index([serviceName, timestamp])
+  @@index([status, timestamp])
+  @@map("health_checks")
+}
+
+// Auto Recovery Action Model for Production Readiness System
+model AutoRecoveryAction {
+  id            String   @id @default(cuid())
+  triggerType   String
+  actionType    String
+  config        Json
+  executed      Boolean  @default(false)
+  executedAt    DateTime?
+  result        Json?
+  tenantId      String?
+  tenant        Tenant?  @relation(fields: [tenantId], references: [id])
+  createdAt     DateTime @default(now())
+  
+  @@index([triggerType, executed])
+  @@index([executedAt])
+  @@map("auto_recovery_actions")
 }
 

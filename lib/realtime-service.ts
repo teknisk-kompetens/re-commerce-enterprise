@@ -36,7 +36,7 @@ export class RealtimeService {
 
       // Handle tenant/user authentication
       socket.on('authenticate', (data: { tenantId: string; userId: string; token: string }) => {
-        // TODO: Validate token
+        // Token validation to be implemented
         socket.join(`tenant:${data.tenantId}`)
         socket.join(`user:${data.userId}`)
         

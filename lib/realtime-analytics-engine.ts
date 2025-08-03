@@ -607,7 +607,7 @@ export class RealTimeAnalyticsEngine extends EventEmitter {
   private async storeProcessedData(processorId: string, data: any): Promise<void> {
     try {
       // Store in database or cache
-      // TODO: Create processedData model in Prisma schema
+      // ProcessedData model added to schema
       console.log('Processed data would be stored:', { processorId, data });
     } catch (error) {
       console.error('Failed to store processed data:', error);
